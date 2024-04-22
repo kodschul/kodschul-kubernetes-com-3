@@ -17,7 +17,7 @@ def index():
     backend_response = requests.get("http://backend:80").text
     backend_response = "Backend is coming later!"
     backend_response = ips
-    return f'<html style="background:green;">Hello World V1, The backend said: {backend_response} </html>'
+    return f'<html style="background:orange;">Hello World V1, The backend said: {backend_response} </html>'
     # return f'<html style="background:orange;">Hello World V1 </html>'
 
 

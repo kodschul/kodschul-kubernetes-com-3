@@ -1,12 +1,21 @@
 version: "3.8"
 
 services:
+  db:
+    image: adminer
+
   frontend:
     build: frontend
+    image: frontend:v1
     ports:
-      - "1500:80"
+      - "${FRONTEND_PORT}:80"
+    volumes:
+      - ./frontend:/frontend
 
   backend:
     build: backend-code
+    image: backend:v1
     ports:
-      - "1800:80"
+      - "${BACKEND_PORT}:80"
+    volumes:
+      - ./backend-code:/backend
