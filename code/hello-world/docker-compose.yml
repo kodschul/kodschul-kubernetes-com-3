@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  frontend:
+    build: frontend
+    ports:
+      - "1500:80"
+
+  backend:
+    build: backend-code
+    ports:
+      - "1800:80"
