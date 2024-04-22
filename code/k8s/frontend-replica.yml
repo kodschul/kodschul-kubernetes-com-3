@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: frontend
+
+spec:
+  replicas: 1
+
+  # welche Pods wollen wir verwalten
+  selector:
+    matchLabels:
+      module: frontend
+
+  # welche Pods sollten erstellt werden
+
+  template:
+    metadata:
+      labels:
+        module: frontend
+
+    spec:
+      containers:
+        - name: frontend
+          image: coolapp-frontend:v2
+          ports:
+            - containerPort: 5000

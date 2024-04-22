@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      module: frontend
+
+  template:
+    metadata:
+      name: frontend
+      labels:
+        module: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: hello-world-frontend:2.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+
+          volumeMounts:
+            - name: app-storage-volume
+              mountPath: /frontend/data
+
+      volumes:
+        - name: app-storage-volume
+          persistentVolumeClaim:
+            claimName: app-storage

@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron
+spec:
+  schedule: "* * * * *"
+  suspend: true
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: frontend
+              image: hello-world-frontend:2.0
+              command: ["echo", "hello"]
+              imagePullPolicy: IfNotPresent
+              ports:
+                - containerPort: 80
+
+              volumeMounts:
+                - name: app-storage-volume
+                  mountPath: /frontend/data
+
+          volumes:
+            - name: app-storage-volume
+              persistentVolumeClaim:
+                claimName: app-storage

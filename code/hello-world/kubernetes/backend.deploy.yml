@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  selector:
+    matchLabels:
+      module: backend
+
+  template:
+    metadata:
+      name: backend
+      labels:
+        module: backend
+    spec:
+      containers:
+        - name: backend
+          image: hello-world-backend:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
