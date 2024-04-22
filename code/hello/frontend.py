@@ -18,7 +18,7 @@ def index():
     # backend_response = "Backend is coming later!"
     # backend_response = ips
     # return f'<html style="background:green;">Hello World V1, The backend said: {backend_response} </html>'
-    return f'<html style="background:green;">Hello World V1</html>'
+    return f'<html style="background:yellow;">Hello World V1</html>'
 
 
 app.run(host='0.0.0.0', port=80, debug=False)

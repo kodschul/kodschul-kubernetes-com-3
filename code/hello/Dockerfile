@@ -1,10 +1,10 @@
-FROM python:3.10-alpine
+FROM python:3.9-alpine
 
+# -- install packages
 RUN pip install flask requests
 
-WORKDIR /frontend
-
-COPY . . 
+WORKDIR /app
+COPY frontend.py .
 
 CMD [ "python", "frontend.py" ]
 
