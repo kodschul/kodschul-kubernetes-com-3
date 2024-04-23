@@ -4,7 +4,7 @@ metadata:
   name: frontend
 spec:
   selector:
-    abc: bcef
+    module: frontend
 
   ports:
     # freiwillig wählbar

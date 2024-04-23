@@ -4,14 +4,11 @@ metadata:
   name: frontend
 
 spec:
-  replicas: 1
+  replicas: 3
 
-  # welche Pods wollen wir verwalten
   selector:
     matchLabels:
       module: frontend
-
-  # welche Pods sollten erstellt werden
 
   template:
     metadata:
@@ -21,6 +18,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: coolapp-frontend:v1
+          image: frontend:v1
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 5000
+            - containerPort: 80
