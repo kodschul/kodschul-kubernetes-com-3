@@ -1,13 +1,13 @@
-apiVersion: v1
-kind: Pod
-metadata:
-  name: backend
-  labels:
-    app: backend
-spec:
-  containers:
-    - name: backend
-      image: backend:v1
-      imagePullPolicy: IfNotPresent
-      ports:
-        - containerPort: 80
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: backend
+#   labels:
+#     app: backend
+# spec:
+#   containers:
+#     - name: backend
+#       image: backend:v1
+#       imagePullPolicy: IfNotPresent
+#       ports:
+#         - containerPort: 80

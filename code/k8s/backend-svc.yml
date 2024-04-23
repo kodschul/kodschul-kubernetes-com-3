@@ -4,7 +4,7 @@ metadata:
   name: backend
 spec:
   selector:
-    app: backend
+    module: backend
 
   ports:
     # freiwillig wählbar

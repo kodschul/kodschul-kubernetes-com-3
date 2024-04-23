@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-  name: frontend
+  name: backend
 
 spec:
   selector:
     matchLabels:
-      module: frontend
+      module: backend
 
   template:
     metadata:
       labels:
-        module: frontend
+        module: backend
 
     spec:
       containers:
-        - name: frontend
-          image: frontend:v2
+        - name: backend
+          image: backend:v1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
