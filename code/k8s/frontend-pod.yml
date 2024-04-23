@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: frontend2
+  name: frontend
   labels:
-    module: frontend
-
+    abc: bcef
+    xyz: abc
 spec:
   containers:
     - name: frontend
-      image: coolapp-frontend:v1
+      image: frontend:v1
+      imagePullPolicy: IfNotPresent
       ports:
-        - containerPort: 5000
+        - containerPort: 80
