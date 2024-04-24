@@ -12,7 +12,7 @@ spec:
       template:
         spec:
           containers:
-            - name: frontend
+            - name: backend-cron
               image: backend:v1
               command: ["python", "backup.py"]
               imagePullPolicy: IfNotPresent
