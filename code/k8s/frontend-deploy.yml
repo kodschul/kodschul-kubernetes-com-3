@@ -20,13 +20,26 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
-          env:
-            - name: DB_SECRET
-              value: abc_overwritten_by_deploy_3
+          envFrom:
+            - secretRef:
+                name: app-secret
 
-          # volumeMounts:
-          #   - name: app-storage-disk
-          #     mountPath: /data
+      #     volumeMounts:
+      #       - name: app-config-disk
+      #         mountPath: /test/config
+
+      # volumes:
+      #   - name: app-config-disk
+      #     configMap:
+      #       name: app-config
+
+      # env:
+      #   - name: DB_SECRET
+      #     value: abc_overwritten_by_deploy_3
+
+      # volumeMounts:
+      #   - name: app-storage-disk
+      #     mountPath: /data
 
       # volumes:
       #   - name: app-storage-disk
