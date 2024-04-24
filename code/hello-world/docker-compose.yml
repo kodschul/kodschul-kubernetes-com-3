@@ -6,7 +6,7 @@ services:
 
   frontend:
     build: frontend
-    image: frontend:v3
+    image: frontend:v4
     ports:
       - "${FRONTEND_PORT}:80"
     volumes:

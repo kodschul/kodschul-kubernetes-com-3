@@ -16,16 +16,19 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: frontend:v3
+          image: frontend:v4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
+          env:
+            - name: DB_SECRET
+              value: abc_overwritten_by_deploy_3
 
-          volumeMounts:
-            - name: app-storage-disk
-              mountPath: /data
+          # volumeMounts:
+          #   - name: app-storage-disk
+          #     mountPath: /data
 
-      volumes:
-        - name: app-storage-disk
-          persistentVolumeClaim:
-            claimName: app-storage
+      # volumes:
+      #   - name: app-storage-disk
+      #     persistentVolumeClaim:
+      #       claimName: app-storage
