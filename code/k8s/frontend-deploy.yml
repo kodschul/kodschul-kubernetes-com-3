@@ -16,7 +16,16 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: frontend:v2
+          image: frontend:v3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
+
+          volumeMounts:
+            - name: data-storage
+              mountPath: /data
+
+      volumes:
+        - name: data-storage
+          hostPath:
+            path: /tmp/data
