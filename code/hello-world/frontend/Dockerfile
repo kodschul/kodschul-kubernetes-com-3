@@ -6,6 +6,8 @@ RUN pip install flask requests
 WORKDIR /frontend
 COPY . .
 
-ENTRYPOINT [ "python", "frontend.py" ]
+
+CMD [ "python", "frontend.py" ]
+
 
 EXPOSE 80
