@@ -22,10 +22,10 @@ spec:
             - containerPort: 80
 
           volumeMounts:
-            - name: data-storage
+            - name: app-storage-disk
               mountPath: /data
 
       volumes:
-        - name: data-storage
-          hostPath:
-            path: /tmp/data
+        - name: app-storage-disk
+          persistentVolumeClaim:
+            claimName: app-storage
