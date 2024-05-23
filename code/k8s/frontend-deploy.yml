@@ -6,42 +6,26 @@ metadata:
 spec:
   selector:
     matchLabels:
-      module: frontend
+      app-frontend: frontend-value
 
   template:
     metadata:
+      name: frontend
       labels:
-        module: frontend
+        app-frontend: frontend-value
 
     spec:
       containers:
-        - name: frontend
-          image: frontend:v4
-          imagePullPolicy: IfNotPresent
+        - name: app
+          image: frontend:v1
+          imagePullPolicy: Never
           ports:
             - containerPort: 80
-          envFrom:
-            - secretRef:
-                name: app-secret
 
-      #     volumeMounts:
-      #       - name: app-config-disk
-      #         mountPath: /test/config
-
-      # volumes:
-      #   - name: app-config-disk
-      #     configMap:
-      #       name: app-config
-
-      # env:
-      #   - name: DB_SECRET
-      #     value: abc_overwritten_by_deploy_3
-
-      # volumeMounts:
-      #   - name: app-storage-disk
-      #     mountPath: /data
-
-      # volumes:
-      #   - name: app-storage-disk
-      #     persistentVolumeClaim:
-      #       claimName: app-storage
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "100m"
+            limits:
+              memory: "50Mi"
+              cpu: "100m"
