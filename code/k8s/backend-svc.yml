@@ -4,13 +4,9 @@ metadata:
   name: backend
 spec:
   selector:
-    module: backend
-
+    app: backend
   ports:
-    # freiwillig wählbar
-    - port: 81
-      # container port
+    - port: 80
+      # Container Port
       targetPort: 80
-      nodePort: 32051
-
-  type: NodePort
+  type: ClusterIP

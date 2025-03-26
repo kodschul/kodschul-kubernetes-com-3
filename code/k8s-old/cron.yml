@@ -4,14 +4,16 @@ metadata:
   name: cron
 spec:
   schedule: "* * * * *"
-  # suspend: true
+  suspend: true
+
   jobTemplate:
     spec:
+      backoffLimit: 1
       template:
         spec:
           containers:
-            - name: frontend
-              image: frontend:v1
-              command: ["echo", "Backup done"]
+            - name: backend-cron
+              image: backend:v1
+              command: ["python", "backup.py"]
               imagePullPolicy: IfNotPresent
           restartPolicy: Never

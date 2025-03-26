@@ -1,15 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
-
+  name: backend
 spec:
   selector:
-    app-frontend: frontend-value
+    module: backend
 
   ports:
-    - port: 80
+    # freiwillig wählbar
+    - port: 81
       # container port
       targetPort: 80
+      nodePort: 32051
 
   type: NodePort

@@ -6,18 +6,17 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app-frontend: frontend-value
+      module: frontend
 
   template:
     metadata:
-      name: frontend
       labels:
-        app-frontend: frontend-value
+        module: frontend
 
     spec:
       containers:
-        - name: app
-          image: app-frontend:latest
-          imagePullPolicy: Never
+        - name: frontend
+          image: frontend:v2
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

@@ -6,17 +6,18 @@ metadata:
 spec:
   selector:
     matchLabels:
-      module: backend
+      app: backend
 
   template:
     metadata:
+      name: backend
       labels:
-        module: backend
+        app: backend
 
     spec:
       containers:
-        - name: backend
+        - name: app
           image: backend:v1
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Never
           ports:
             - containerPort: 80

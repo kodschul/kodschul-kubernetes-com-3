@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+
+spec:
+  selector:
+    matchLabels:
+      module: frontend
+
+  template:
+    metadata:
+      labels:
+        module: frontend
+
+    spec:
+      containers:
+        - name: frontend
+          image: frontend:v4
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          envFrom:
+            - secretRef:
+                name: app-secret
+
+      #     volumeMounts:
+      #       - name: app-config-disk
+      #         mountPath: /test/config
+
+      # volumes:
+      #   - name: app-config-disk
+      #     configMap:
+      #       name: app-config
+
+      # env:
+      #   - name: DB_SECRET
+      #     value: abc_overwritten_by_deploy_3
+
+      # volumeMounts:
+      #   - name: app-storage-disk
+      #     mountPath: /data
+
+      # volumes:
+      #   - name: app-storage-disk
+      #     persistentVolumeClaim:
+      #       claimName: app-storage

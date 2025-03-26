@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: frontend:v1
+          image: frontend:v2
           imagePullPolicy: Never
           ports:
             - containerPort: 80
@@ -29,3 +29,38 @@ spec:
             limits:
               memory: "50Mi"
               cpu: "100m"
+
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+
+          # readinessProbe:
+          #   exec:
+          #     command:
+          #       - echo
+          #       - ok
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 3
+
+          # livenessProbe:
+          #   exec:
+          #     command:
+          #       - echo
+          #       - ok
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 3
+
+          volumeMounts:
+            - name: app-storage-disk
+              mountPath: /data
+
+      volumes:
+        - name: data-disk
+          hostPath:
+            path: /tmp/data-disk
+
+        - name: app-storage-disk
+          persistentVolumeClaim:
+            claimName: app-storage

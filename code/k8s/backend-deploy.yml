@@ -1,23 +1,23 @@
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name: frontend
+  name: backend
 
 spec:
   selector:
     matchLabels:
-      app-frontend: frontend-value
+      app: backend
 
   template:
     metadata:
-      name: frontend
+      name: backend
       labels:
-        app-frontend: frontend-value
+        app: backend
 
     spec:
       containers:
         - name: app
-          image: app-frontend:latest
+          image: backend:v1
           imagePullPolicy: Never
           ports:
             - containerPort: 80

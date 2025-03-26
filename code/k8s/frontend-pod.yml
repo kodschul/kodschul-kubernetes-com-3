@@ -3,11 +3,11 @@ kind: Pod
 metadata:
   name: frontend
   labels:
-    module: frontend
+    app-frontend: frontend-value
+
 spec:
   containers:
-    - name: frontend
-      image: frontend:v1
-      imagePullPolicy: IfNotPresent
+    - name: app
+      image: app-frontend:latest
       ports:
         - containerPort: 80
