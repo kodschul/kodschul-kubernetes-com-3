@@ -5,15 +5,25 @@ metadata:
   labels:
     tier: frontend
 
+  annotations:
+    kubernetes.io/change-cause: "Upgrade to v1"
+
 spec:
   selector:
     matchLabels:
       tier: frontend
 
+  # strategy:
+  #   type: RollingUpdate
+  #   rollingUpdate:
+  #     maxUnavailable: 25%
+  #     maxSurge: 25%
+
   template:
     metadata:
       labels:
         tier: frontend
+        module: frontend
 
     spec:
       containers:
@@ -21,3 +31,15 @@ spec:
           image: frontend:v1
           ports:
             - containerPort: 80
+
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "30Mi"
+              # pid: 2
+# v2 UNDO -> v1
+# v1 UNDO -> v2
+
+# v3
+# v2
+# v1
