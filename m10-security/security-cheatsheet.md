@@ -13,6 +13,7 @@ Alle Befehle aus dem Ordner `project/` (Stand: 11/2026).
 | `kubectl auth can-i --list -n hello-dev --as=anna` | alle Rechte von `anna` im Namespace |
 | `kubectl auth can-i list pods -n hello --as=system:serviceaccount:hello:hello-reader` | Rechte eines ServiceAccounts prüfen |
 | `kubectl get pods -n hello-prod --as=ben` | echten Befehl im Namen von `ben` ausführen |
+| `kubectl auth can-i list nodes --as=ben --as-group=ops` | Prüfung im Namen von `ben` als Mitglied der Gruppe `ops` |
 | `helm list -n hello-dev --kube-as-user anna` | Helm im Namen von `anna` |
 
 ## RBAC-Objekte
@@ -21,6 +22,8 @@ Alle Befehle aus dem Ordner `project/` (Stand: 11/2026).
 | --- | --- |
 | `kubectl apply -f playground/k8s/rbac.yaml` | Roles und RoleBindings anlegen |
 | `kubectl get role,rolebinding -n hello-dev` | Rollen und Bindungen im Namespace |
+| `kubectl get clusterrole,clusterrolebinding` | clusterweite Rollen und Bindungen (ohne `-n`) |
+| `kubectl describe clusterrole view` | Regeln einer fertigen Rolle (`view`, `edit`, `admin`, `cluster-admin`) |
 | `kubectl api-resources` | Ressourcen-Namen und API-Gruppen für `rules` |
 
 ## Bausteine einer Rolle
@@ -31,6 +34,7 @@ Alle Befehle aus dem Ordner `project/` (Stand: 11/2026).
 | `resources` | `["pods", "pods/log", "deployments/scale"]` | Objektarten und Unterressourcen |
 | `verbs` | `["get", "list", "watch"]` | erlaubte Aktionen; nur lesen = `get`, `list`, `watch` |
 | `subjects[].kind` | `User`, `Group`, `ServiceAccount` | wer die Rolle bekommt |
+| `aggregationRule` | `clusterRoleSelectors` mit Label `rbac.authorization.k8s.io/aggregate-to-view: "true"` | ClusterRole sammelt Regeln anderer ClusterRoles ein |
 | `roleRef` | `kind: Role`, `name: deployer` | welche Rolle; nicht änderbar |
 
 ## ServiceAccounts

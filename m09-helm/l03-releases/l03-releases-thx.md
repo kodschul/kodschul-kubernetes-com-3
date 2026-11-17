@@ -128,6 +128,8 @@ Digest: sha256:3f1c…
 
 Die Chart-Version wird zum Tag in der Registry. Helm 4 kann zusätzlich über den Digest installieren (`oci://…/hello@sha256:…`): Helm lehnt ein Chart ab, dessen Inhalt nicht zum Digest passt. In der Übung bleibt dieser Teil Theorie, weil er ein Registry-Konto braucht.
 
+Ohne Registry geht der klassische Weg aus Lab 9.1: Jeder Webserver, der Dateien ausliefert (GitHub Pages, ein S3-Bucket, ein interner Webserver), wird zum Repository. `helm repo index <ordner> --url https://…` schreibt dazu die Inhaltsliste `index.yaml` für alle `.tgz` im Ordner; beides wird hochgeladen, danach funktionieren `helm repo add` und `helm search repo`.
+
 ## Helm in CI/CD
 
 Eine Pipeline führt bei jeder Änderung dieselben Schritte aus wie die Übung, nur ohne Handarbeit:
@@ -136,7 +138,15 @@ Eine Pipeline führt bei jeder Änderung dieselben Schritte aus wie die Übung, 
 2. Image bauen und mit eindeutigem Tag in die Registry laden,
 3. `helm upgrade --install hello ./hello -n hello-prod -f values-prod.yaml --set frontend.image.tag=<tag> --rollback-on-failure`.
 
-Das Protokoll der Pipeline beantwortet „wer hat wann geändert". Werkzeuge, die den Cluster laufend mit einem Git-Repository abgleichen (Argo CD, Flux), sind Thema in Lab 11.3.
+Das Protokoll der Pipeline beantwortet „wer hat wann geändert". Weil `helm` ein einzelnes Programm ist, läuft es in jedem CI/CD-Werkzeug:
+
+| Werkzeug | So kommt Helm in die Pipeline |
+| --- | --- |
+| GitLab CI/CD | Job in `.gitlab-ci.yml` mit einem Image, das `helm` enthält (z. B. `alpine/helm`), Beispiel in der Vertiefung |
+| GitHub Actions | Schritt `azure/setup-helm` installiert Helm, danach `run: helm upgrade --install …` |
+| Jenkins | Pipeline-Schritt `sh 'helm upgrade --install …'` auf einem Agenten mit Helm |
+
+Die Pipeline braucht Zugang zum Cluster: eine kubeconfig als geschützte Variable des CI-Werkzeugs, mit einem eigenen Konto und begrenzten Rechten (Lab 10.1 und 10.2). Werkzeuge, die den Cluster laufend mit einem Git-Repository abgleichen (Argo CD, Flux), sind Thema in Lab 11.3.
 
 ## Typische Fehler
 
@@ -157,3 +167,37 @@ Das Protokoll der Pipeline beantwortet „wer hat wann geändert". Werkzeuge, di
 - Chart-Version und App-Version zählen getrennt; verpackte Charts reisen über OCI-Registries.
 
 In der Übung läuft das Chart `hello` in `hello-dev` und `hello-prod`, prod wird auf `v2` gehoben, scheitert einmal absichtlich und wird zurückgerollt.
+
+## Vertiefung
+
+### Pipeline mit Helm in GitLab CI/CD
+
+Zwei Stufen: Erst prüfen, dann ausrollen. Scheitert das Ausrollen, setzt `--rollback-on-failure` den letzten guten Stand zurück, und der Job endet rot.
+
+```yaml
+# .gitlab-ci.yml im Repository neben dem Ordner hello/ und values-prod.yaml
+stages: [test, deploy]
+
+default:
+  image:
+    name: alpine/helm:4.3.2   # Image mit Helm 4, Version fest
+    entrypoint: [""]          # das Image startet sonst direkt helm
+
+chart-pruefen:
+  stage: test
+  script:
+    - helm lint ./hello
+    - helm template hello ./hello -f values-prod.yaml > /dev/null
+
+prod-ausrollen:
+  stage: deploy
+  script:                     # KUBECONFIG ist als geschützte Datei-Variable in GitLab hinterlegt
+    - helm upgrade --install hello ./hello -n hello-prod -f values-prod.yaml
+      --set frontend.image.tag=$CI_COMMIT_SHORT_SHA
+      --rollback-on-failure --timeout 5m
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH   # nur Änderungen am Hauptzweig
+  environment: production
+```
+
+`$CI_COMMIT_SHORT_SHA` ist die Kurzkennung der Änderung im Repository; ein vorheriger Job baut das Image mit genau diesem Tag (hier weggelassen). So passt jede Revision in `helm history` zu genau einer Änderung im Repository. Tag `alpine/helm:4.3.2` vom 13.11.2026, Stand: 11/2026 ([Docker Hub](https://hub.docker.com/r/alpine/helm/tags)).

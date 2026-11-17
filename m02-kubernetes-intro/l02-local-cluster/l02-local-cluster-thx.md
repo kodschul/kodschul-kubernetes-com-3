@@ -115,7 +115,7 @@ Ein lokales Cluster belegt Arbeitsspeicher und CPU, auch wenn nichts darin läuf
 | Ziel | Docker Desktop (Kubeadm) | minikube | kind |
 | --- | --- | --- | --- |
 | Zustand prüfen | Statusleiste `Kubernetes running`, `kubectl get nodes` | `minikube status` | `kubectl get nodes` |
-| vorübergehend anhalten | Docker Desktop beenden; beim nächsten Start läuft das Cluster wieder | `minikube stop` | – (Cluster löschen und neu erstellen) |
+| vorübergehend anhalten | Docker Desktop beenden; beim nächsten Start läuft das Cluster wieder (prüfen) | `minikube stop` | – (Cluster löschen und neu erstellen) |
 | leeren Ausgangszustand herstellen | **Kubernetes** > **Reset cluster** | `minikube delete`, dann `minikube start` | `kind delete cluster --name kurs`, dann neu erstellen |
 | ganz entfernen | **Kubernetes** > **Stop**: entfernt die Cluster-Container und den Befehl `kubectl` von Docker Desktop | `minikube delete` | `kind delete cluster --name kurs` |
 

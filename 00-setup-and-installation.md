@@ -206,7 +206,7 @@ Der Befehl zeigt einen Code und eine Adresse; im Browser bestätigen, danach mel
 
 ## Fallback: minikube oder kind
 
-Wenn Docker Desktop nicht erlaubt ist oder Kubernetes darin nicht startet, läuft der Kurs auch mit minikube oder kind. Beide brauchen eine Container-Engine (Docker Engine, Docker Desktop oder Podman).
+Wenn Docker Desktop nicht erlaubt ist oder Kubernetes darin nicht startet, läuft der Kurs auch mit minikube oder kind. Beide brauchen eine Container-Engine (Docker Engine, Docker Desktop oder Podman). minikube wählt den Treiber `docker` automatisch, wenn Docker läuft (ausdrücklich: `minikube start --driver=docker`); alternativ läuft es in einer VM, z. B. mit `--driver=hyperv` oder `--driver=virtualbox`.
 
 | | minikube (v1.39) | kind (v0.33) |
 | --- | --- | --- |

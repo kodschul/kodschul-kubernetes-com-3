@@ -72,7 +72,7 @@ Weitere Anweisungen, die in fremden Dockerfiles häufig vorkommen (die Hello-App
 | `ARG` | Build-Argument: Variable nur während des Bauens, Wert per `docker build --build-arg` | `ARG PYTHON_VERSION=3.14` |
 | `ENTRYPOINT` | festes Startprogramm; `CMD` liefert dann nur noch die Standard-Argumente | `ENTRYPOINT ["python", "app.py"]` |
 | `ADD` | wie `COPY`, lädt zusätzlich URLs herunter und entpackt lokale `.tar`-Archive; ohne diesen Bedarf `COPY` nehmen | `ADD app.tar.gz /app/` |
-| `VOLUME` | markiert einen Ordner für Daten; ohne `-v` legt Docker bei jedem Start ein anonymes Volume dafür an | `VOLUME /data` |
+| `VOLUME` | markiert einen Ordner für Daten; ohne `-v` legt Docker für jeden neuen Container ein anonymes Volume dafür an | `VOLUME /data` |
 | `LABEL` | Metadaten wie Herkunft oder Version; sichtbar mit `docker inspect` | `LABEL org.opencontainers.image.source="https://github.com/…"` |
 | `HEALTHCHECK` | Docker prüft regelmäßig, ob die App antwortet; `docker ps` zeigt `(healthy)`. Kubernetes ignoriert die Anweisung und nutzt Probes (Lab 8.1) | `HEALTHCHECK CMD wget -qO- http://localhost/healthz \|\| exit 1` |
 

@@ -35,7 +35,7 @@ Schrittweise: neue Kopien starten, erst wenn sie bereit sind alte abschalten, be
 
 ## Viele Container auf vielen Servern
 
-Viele Anwendungen bestehen heute aus Microservices: kleinen, spezialisierten Diensten (Anmeldung, Warenkorb, Suche), jeder in eigenen Containern und meist in mehreren Kopien. So entstehen schnell Hunderte Container. Sie von Hand oder mit Skripten zu verwalten ist fehleranfällig und führt zu Ausfällen, Engpässen und ungleich verteilter Last.
+Viele Anwendungen bestehen heute aus Microservices: kleinen, spezialisierten Diensten (Anmeldung, Warenkorb, Suche), jeder in eigenen Containern und meist in mehreren Kopien. So entstehen schnell Hunderte Container. Diese von Hand oder mit Skripten zu verwalten ist fehleranfällig und führt zu Ausfällen, Engpässen und ungleich verteilter Last.
 
 Mit Docker allein startet jeder Container auf genau dem Rechner, auf dem `docker run` läuft. Im Betrieb kommen Fragen hinzu, die kein einzelner `docker run` beantwortet:
 

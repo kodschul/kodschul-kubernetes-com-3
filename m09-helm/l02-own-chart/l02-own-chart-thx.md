@@ -28,6 +28,8 @@ Erst die Form prüfen (Syntax, Pflichtfelder), dann das Ergebnis ansehen: die Vo
 | `templates/` | Ordner mit den Vorlagen; jede Datei wird zu einem oder mehreren Manifesten |
 | `_helpers.tpl` | Datei mit wiederverwendbaren Textbausteinen; Dateien mit `_` am Anfang erzeugen keine Objekte |
 | `NOTES.txt` | Text, den Helm nach der Installation ausgibt, z. B. die Adresse der App |
+| `charts/` | Ordner für Subcharts: fremde Charts, die das eigene Chart mitinstalliert (siehe Vertiefung) |
+| `helm create` | erzeugt ein neues Chart-Grundgerüst mit Beispiel-Templates |
 | `{{ … }}` | Template-Ausdruck: Helm ersetzt ihn beim Rendern durch einen Wert (Sprache: Go-Templates) |
 | Rendern | Vorlagen mit Werten füllen; heraus kommt normales Kubernetes-YAML |
 | Pipe `\|` | reicht einen Wert an eine Funktion weiter, wie `\|` in der Shell: `{{ .Values.color \| quote }}` |
@@ -62,6 +64,8 @@ type: application       # installierbar
 version: 0.1.0          # Version des Charts
 appVersion: "v2"        # Version der App; Standard-Tag des Frontends
 ```
+
+Ein neues Chart beginnt meist mit `helm create <name>`. Das Grundgerüst enthält `Chart.yaml`, `values.yaml`, einen leeren Ordner `charts/` und Beispiel-Templates für ein nginx-Image: Deployment, Service, ServiceAccount, HPA, Ingress, HTTPRoute, `NOTES.txt`, `_helpers.tpl` und einen Test unter `templates/tests/` (Helm 4.3). Für die Hello-App ist das zu viel und passt nicht zu den eigenen Manifesten; der Starter der Übung enthält deshalb nur die Dateien oben.
 
 Nicht im Chart: das Secret `hello-secret` (Passwörter gehören nicht in Chart-Dateien, Lab 6.2), das Gateway (gehört dem Cluster, nicht der App) sowie CronJob und HPA (Erweiterung der Übung).
 
@@ -195,3 +199,27 @@ Die PVC `hello-data` wird dabei gelöscht; das `access.log` beginnt danach neu. 
 - `helm lint` und `helm template` prüfen ohne Cluster, `--dry-run=server` mit Cluster; erst danach `helm install`.
 
 In der Übung wird der Starter zum Chart `hello` vervollständigt, geprüft und anstelle der einzelnen Manifeste installiert.
+
+## Vertiefung
+
+### Abhängigkeiten als Subcharts
+
+Braucht eine App eine fertige Komponente, etwa einen Cache oder eine Datenbank, verweist `Chart.yaml` auf deren Chart, statt die Manifeste zu kopieren. Beispiel mit podinfo aus Lab 9.1:
+
+```yaml
+# Chart.yaml (Ausschnitt)
+dependencies:
+  - name: podinfo
+    version: 6.17.0                                 # feste Version, wie bei helm install
+    repository: oci://ghcr.io/stefanprodan/charts   # oder https://… eines klassischen Repositorys
+    condition: podinfo.enabled                      # Subchart per Wert ein- und ausschalten
+```
+
+```yaml
+# values.yaml des eigenen Charts: Werte für das Subchart stehen unter seinem Namen
+podinfo:
+  enabled: true
+  replicaCount: 2
+```
+
+`helm dependency update <chart-ordner>` lädt das Subchart als `podinfo-6.17.0.tgz` nach `charts/` und schreibt `Chart.lock` mit den genauen Versionen. Danach installiert `helm install` beide Charts als ein Release. Das Chart `hello` braucht keine Abhängigkeit; der Weg ist hier nur zum Lesen fremder Charts wichtig.

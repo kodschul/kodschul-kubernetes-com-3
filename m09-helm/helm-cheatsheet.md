@@ -41,6 +41,7 @@ Alle Befehle aus dem Ordner `project/`, Helm 4 (Stand: 11/2026).
 | Befehl | Wirkung |
 | --- | --- |
 | `helm create demo` | Beispiel-Chart `demo` mit allen Dateien erzeugen |
+| `helm dependency update <chart-ordner>` | Subcharts aus `dependencies` in `Chart.yaml` nach `charts/` laden, `Chart.lock` schreiben |
 | `helm lint playground/hello` | Chart auf Fehler prüfen, ohne Cluster |
 | `helm template hello playground/hello -n hello` | Chart rendern und YAML ausgeben, ohne Cluster |
 | `helm template … --set color=pink \| grep APP_COLOR` | Wirkung eines Werts prüfen |
@@ -64,6 +65,7 @@ Alle Befehle aus dem Ordner `project/`, Helm 4 (Stand: 11/2026).
 | `helm registry login ghcr.io -u <benutzer>` | bei einer OCI-Registry anmelden (nur Domainname) |
 | `helm push hello-0.1.0.tgz oci://ghcr.io/<benutzer>/charts` | Chart in die Registry laden |
 | `helm install hello oci://…/hello@sha256:<digest>` | nur genau diesen Inhalt installieren (Helm 4) |
+| `helm repo index <ordner> --url https://…` | `index.yaml` für ein klassisches Repository (GitHub Pages, S3, Webserver) erzeugen |
 
 ## Template-Syntax
 

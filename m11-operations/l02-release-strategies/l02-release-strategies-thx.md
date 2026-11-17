@@ -45,6 +45,14 @@ Doppelte Ressourcen für die Dauer des Umstiegs: CPU, Speicher, bei Datenbanken 
 
 Rolling und Recreate tauschen die Version eines Deployments aus. Blue/Green, Canary und A/B lassen zwei Deployments nebeneinander laufen und steuern davor, wer welche Version sieht.
 
+| Strategie | Vorteil | Nachteil | passt für |
+| --- | --- | --- | --- |
+| Blue/Green | Rückweg in Sekunden, neue Version vorab vollständig testbar | doppelte Ressourcen; Datenbank muss zu beiden Versionen passen | Anwendungen, bei denen Ausfallzeit teuer ist |
+| Canary | Fehler treffen nur einen kleinen Teil der Nutzer | braucht Messwerte je Version und Geduld; eine Person kann bei jedem Klick eine andere Version sehen | große Anwendungen mit vielen Nutzern und kritischen Funktionen |
+| A/B-Test | direkte Rückmeldung, welche Variante besser ankommt | uneinheitliches Erlebnis zwischen Gruppen; Auswertung braucht genug Nutzer | neue Funktionen und Oberflächen vergleichen |
+
+Die Wahl ist eine Abwägung aus Risiko, Kosten und Nutzererlebnis: Je weniger Nutzer ein Fehler treffen soll, desto mehr Parallelbetrieb und Beobachtung ist nötig.
+
 ## Blue/Green über den Service-Selector
 
 Zwei Deployments mit gleichen Labels bis auf `version`. Der Service wählt mit `version` genau eine Seite; Umschalten heißt, einen Wert im Selector zu ändern.

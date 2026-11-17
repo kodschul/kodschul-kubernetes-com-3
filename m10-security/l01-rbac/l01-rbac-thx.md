@@ -143,6 +143,36 @@ Woher die Werte kommen: `kubectl api-resources` zeigt für jede Objektart Namen 
 
 Unterressourcen wie `pods/log` oder `deployments/scale` stehen einzeln in der Rolle; `deployments` allein deckt sie nicht ab. RBAC kennt nur Erlaubnisse, keine Verbote: Was nicht erlaubt ist, ist verboten. Mehrere Rollen addieren sich.
 
+## ClusterRole für Nodes
+
+Nodes, Namespaces und PersistentVolumes gehören zu keinem Namespace (Spalte `NAMESPACED false` in `kubectl api-resources`). Rechte darauf gehen nur über eine ClusterRole mit ClusterRoleBinding:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: node-reader                  # kein namespace: gilt clusterweit
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ops-node-reader
+subjects:
+  - kind: Group                      # alle Mitglieder der Gruppe, statt einzelner Benutzer
+    name: ops                        # Gruppe aus Zertifikat (Feld O) oder Identitätsanbieter
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: node-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+Sobald beides angelegt ist, prüft `kubectl auth can-i list nodes --as=ben --as-group=ops` die Rechte so, als wäre `ben` Mitglied der Gruppe `ops`: `yes`. Ohne `--as-group` bleibt es bei `no` (wie in der Übung). Bindungen an Gruppen sparen Arbeit: Wer ins Team kommt oder es verlässt, ändert nur die Gruppe beim Identitätsanbieter, nicht die Bindungen im Cluster.
+
 ## Rechte prüfen mit `kubectl auth can-i`
 
 ```bash
@@ -171,3 +201,24 @@ kubectl auth can-i --list -n hello-dev --as=anna                 # alle Rechte v
 - `kubectl auth can-i … --as=<name>` prüft Rechte, ohne sich als diese Person anzumelden.
 
 In der Übung bekommen `anna` (dev deployen) und `ben` (prod lesen) eigene Rollen, und eine Rechte-Matrix zeigt, was jeweils erlaubt ist.
+
+## Vertiefung
+
+### Zusammengesetzte ClusterRoles
+
+Die fertigen Rollen `view`, `edit` und `admin` sind zusammengesetzt (englisch: aggregated): Ihr Feld `aggregationRule` sammelt die Regeln aller ClusterRoles mit einem bestimmten Label ein. Bringt ein Operator eine neue Objektart mit (CRD, Lab 7.3), liefert er meist eine ClusterRole mit diesem Label mit, und wer `view` hat, kann die neuen Objekte sofort lesen:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cnpg-cluster-view
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-view: "true"   # Regeln wandern in die Rolle view
+rules:
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["clusters"]
+    verbs: ["get", "list", "watch"]
+```
+
+Entsprechend gibt es `aggregate-to-edit` und `aggregate-to-admin`. `kubectl get clusterrole view -o yaml` zeigt die eingesammelten Regeln.

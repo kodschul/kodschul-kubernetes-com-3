@@ -50,7 +50,16 @@ Das Bild aus Lab 10.1, diesmal mit Blick auf den unteren Pfeil: Ein Pod schickt 
 | Anmeldung über | Zertifikat oder Login beim Identitätsanbieter | Token, das der Pod als Datei bekommt |
 | Subject im RoleBinding | `kind: User` | `kind: ServiceAccount` mit `namespace` |
 
-Typische Programme mit eigenem ServiceAccount: Monitoring (Prometheus liest Pods und Nodes), Deploy-Werkzeuge im Cluster (Argo CD, Flux), Operatoren, die eigene Objekte verwalten, Gateway-Controller wie Envoy Gateway aus Lab 5.3.
+Typische Programme mit eigenem ServiceAccount:
+
+| Einsatz | Beispiel | typische Rechte |
+| --- | --- | --- |
+| Monitoring und Logging | Prometheus, Grafana Alloy (Lab 11.3) | Pods, Nodes, Services lesen (`get`, `list`, `watch`) |
+| CI/CD und Deployment | Pipeline mit `helm upgrade` (Lab 9.3), Argo CD, Flux | Deployments, Services, ConfigMaps in einem Namespace ändern |
+| Pods verwalten oder skalieren | Operatoren (Lab 7.3), Gateway-Controller wie Envoy Gateway (Lab 5.3), Autoscaler | eigene Objektarten und Pods anlegen, ändern, löschen |
+| App fragt den Cluster | Test-Pod `api-test` in dieser Übung | nur das, was die App wirklich braucht |
+
+Eine Pipeline außerhalb des Clusters nutzt ebenfalls einen ServiceAccount: Ihre kubeconfig enthält ein Token dieses Kontos (Befehl `kubectl create token` weiter unten), oder sie meldet sich über einen Identitätsanbieter an.
 
 ## Was im Pod ankommt
 

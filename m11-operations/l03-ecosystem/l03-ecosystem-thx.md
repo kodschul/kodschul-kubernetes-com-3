@@ -68,9 +68,22 @@ apiserver_request_total{code="201",component="apiserver",dry_run="",group="apps"
 
 Name, Labels in `{}`, aktueller Wert: genau das sammelt Prometheus von jedem Ziel ein.
 
-- **Einstieg:** Helm-Chart `kube-prometheus-stack` (Prometheus, Grafana, Alertmanager, fertige Dashboards).
+| Baustein | Aufgabe | Beispiel |
+| --- | --- | --- |
+| Ziel (Target) | Adresse, von der Prometheus Metriken abholt | API-Server, Kubelets, Pods mit `/metrics` |
+| Exporter | übersetzt Messwerte eines Systems ins Prometheus-Format | `node-exporter` (CPU, Speicher, Platten je Node), `kube-state-metrics` (gewünschte und bereite Kopien je Deployment) |
+| Pushgateway | Zwischenablage für kurze Jobs, die vorbei sind, bevor Prometheus abholt | Backup-Job `hello-backup` (Lab 7.3) |
+| PromQL | Abfragesprache für Metriken | Beispiele in der Vertiefung |
+| Alertmanager | Alarme aus Regeln bündeln und verschicken | E-Mail, Chat, Bereitschaftsdienst |
+| Grafana | Dashboards für Metriken und Logs; Ansicht „Explore" für freie Abfragen ohne Dashboard | fertige Kubernetes-Dashboards |
+| Prometheus Operator | Operator (Lab 7.3), der Prometheus betreibt; Ziele stehen als Objekte `ServiceMonitor` im Cluster | Teil von `kube-prometheus-stack` |
+| Loki | speichert Logs; indiziert nur Labels (Namespace, Pod, Container), nicht den Text, und ist dadurch günstiger als eine Volltextsuche | Abfragesprache LogQL |
+| Grafana Alloy | Agent als DaemonSet (Lab 7.3) auf jedem Node; liest Container-Logs und schickt sie an Loki („push", anders als Prometheus) | Nachfolger von Promtail |
+
+- **Einstieg:** Helm-Chart `kube-prometheus-stack` (Prometheus, Grafana, Alertmanager, Exporter, fertige Dashboards), Chart-Version 93.3.1 vom 16.11.2026 ([Artifact Hub](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack), Stand: 11/2026):
+  `helm install monitoring oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack --version 93.3.1 -n monitoring --create-namespace`
 - **OpenTelemetry:** herstellerneutraler Standard, um Metriken, Logs und Traces aus der Anwendung zu senden.
-- **Logs:** Loki speichert Logs, **Grafana Alloy** sammelt sie auf den Nodes ein. Neu 2025/2026: Promtail ist seit 02.03.2026 End-of-Life, Nachfolger ist Alloy ([Grafana](https://grafana.com/docs/loki/latest/send-data/promtail/)).
+- **Neu 2025/2026:** Promtail ist seit 02.03.2026 End-of-Life, Nachfolger ist Alloy ([Grafana](https://grafana.com/docs/loki/latest/send-data/promtail/)).
 
 ## GitOps mit Argo CD und Flux
 
@@ -90,7 +103,23 @@ _Quelle: Argo CD Dokumentation (https://argo-cd.readthedocs.io/en/stable/), Apac
 
 Ein Service Mesh setzt Proxys zwischen alle Dienste: Verbindungen werden automatisch verschlüsselt (mTLS), Fehlversuche wiederholt, jede Anfrage gemessen. Canary-Gewichte wie in Lab 11.2 gehen dann auch zwischen internen Diensten.
 
-- **Istio:** verbreitetstes Mesh auf Basis von Envoy. Seit Istio 1.24 (07.11.2024) ist der **Ambient-Modus** allgemein verfügbar: ein Proxy je Node statt eines Sidecar-Containers in jedem Pod ([Istio](https://istio.io/latest/news/releases/1.24.x/announcing-1.24/)). Ältere Unterlagen mit Pilot, Mixer, Citadel und Galley sind überholt; diese Teile stecken seit 2020 in `istiod`.
+<img src="https://istio.io/latest/docs/ops/deployment/architecture/arch.svg" alt="Istio-Architektur im Sidecar-Modus: Service A und Service B mit je einem Proxy in der Datenebene, Anfragen laufen von Proxy zu Proxy; darunter die Steuerebene mit istiod, die den Proxys Dienst-Adressen, Konfiguration und Zertifikate liefert" width="560">
+
+_Quelle: Istio-Dokumentation, „Architecture" (https://istio.io/latest/docs/ops/deployment/architecture/), Apache-2.0, The Istio Authors, abgerufen am 17.11.2026._
+
+| Teil | Aufgabe | bei Istio |
+| --- | --- | --- |
+| Datenebene | Proxys, durch die jede Anfrage zwischen Diensten läuft | Sidecar-Modus: Envoy in jedem Pod; Ambient-Modus: `ztunnel` je Node (mTLS), bei Bedarf ein Waypoint-Proxy (Envoy) je Namespace für Regeln nach Pfad oder Header |
+| Steuerebene | verteilt Dienst-Adressen, Routing-Regeln und Zertifikate an die Proxys | `istiod`, ein einziges Programm |
+
+| Funktion | Was das Mesh übernimmt |
+| --- | --- |
+| Verkehrssteuerung | Gewichte, Regeln nach Header, Timeouts, Wiederholungen, Circuit Breaking (Anfragen an einen überlasteten Dienst vorübergehend stoppen) |
+| Sicherheit | mTLS: beide Seiten weisen sich per Zertifikat aus, die Verbindung ist verschlüsselt; Regeln, welcher Dienst welchen aufrufen darf |
+| Observability | Metriken, Logs und Traces je Anfrage, ohne Änderung am Code |
+
+- **Istio:** verbreitetstes Mesh auf Basis von Envoy, aktuell 1.32 (09.11.2026, [Releases](https://github.com/istio/istio/releases), Stand: 11/2026). Seit Istio 1.24 (07.11.2024) ist der **Ambient-Modus** allgemein verfügbar ([Istio](https://istio.io/latest/news/releases/1.24.x/announcing-1.24/)). Ältere Unterlagen mit Pilot, Mixer, Citadel und Galley sind überholt: Pilot, Citadel und Galley stecken seit Istio 1.5 (2020) in `istiod`, Mixer ist entfallen.
+- **Envoy:** 2016 bei Lyft entstandener Proxy, seit 2018 CNCF-Projekt mit höchstem Reifegrad ([CNCF](https://www.cncf.io/projects/envoy/)); derselbe Proxy steckt in Envoy Gateway aus Lab 5.3.
 - **Linkerd:** kleineres Mesh mit eigenem, schlankem Proxy; Fokus auf einfachen Betrieb ([linkerd.io](https://linkerd.io/)).
 - Beide unterstützen die Gateway API; ein Mesh lohnt sich erst bei vielen Diensten.
 
