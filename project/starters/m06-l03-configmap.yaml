@@ -1,0 +1,11 @@
+# Lab 6.3 – Starter: ConfigMap je Umgebung
+# Zweimal kopieren: playground/k8s/dev/configmap.yaml und playground/k8s/prod/configmap.yaml, TODO je Datei ergänzen
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-config            # gleicher Name in jeder Umgebung
+  labels:
+    app: hello
+data:
+  BACKEND_URL: http://backend
+  APP_COLOR: # TODO: dev -> lightgreen, prod -> lightblue

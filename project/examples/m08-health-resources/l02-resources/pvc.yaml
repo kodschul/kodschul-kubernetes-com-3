@@ -1,0 +1,15 @@
+# PersistentVolumeClaim "hello-data": Antrag auf 1 GiB Speicher für access.log (Lab 7.2)
+# Ohne storageClassName nimmt Kubernetes die Standard-StorageClass
+# (Docker Desktop: hostpath); sie legt das PersistentVolume automatisch an.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hello-data
+  labels:
+    app: hello
+spec:
+  accessModes:
+    - ReadWriteOnce             # lesen und schreiben von EINEM Node aus (alle Pods auf diesem Node dürfen)
+  resources:
+    requests:
+      storage: 1Gi              # gewünschte Größe

@@ -1,0 +1,22 @@
+# Canary-Route: verteilt Anfragen an canary.hello.localhost nach Gewicht auf v1 und v2 (Lab 11.2)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: hello-canary
+  namespace: hello
+  labels:
+    app: hello
+spec:
+  parentRefs:
+    - name: hello-gateway               # Gateway aus Lab 5.3
+      namespace: gateway
+  hostnames:
+    - canary.hello.localhost            # eigener Host: die Route "hello" aus dem Chart bleibt unverändert
+  rules:
+    - backendRefs:                      # Anteil je Backend = Gewicht / Summe aller Gewichte
+        - name: hello-frontend          # v1 aus dem Helm-Release "hello"
+          port: 80
+          weight: 0                     # Endstand der Übung; Start: 90
+        - name: frontend-v2             # v2, der Canary
+          port: 80
+          weight: 100                   # Endstand der Übung; Start: 10

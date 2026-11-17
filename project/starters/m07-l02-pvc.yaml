@@ -1,0 +1,16 @@
+# Lab 7.2 – Starter: PersistentVolumeClaim für access.log
+# Kopieren nach playground/k8s/pvc.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hello-data
+  labels:
+    app: hello
+spec:
+  # kein storageClassName: die Standard-StorageClass des Clusters wird genutzt
+  accessModes:
+    - # TODO: Zugriffsart "lesen und schreiben von einem Node aus"
+  resources:
+    requests:
+      storage: # TODO: 1 Gibibyte

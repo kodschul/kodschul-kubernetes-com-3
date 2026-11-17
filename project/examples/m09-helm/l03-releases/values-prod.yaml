@@ -1,0 +1,10 @@
+# Werte für die Umgebung prod (Namespace hello-prod). Alles andere kommt aus hello/values.yaml.
+# Installation: helm upgrade --install hello ./hello -n hello-prod -f values-prod.yaml
+host: prod.hello.localhost
+color: lightblue               # wie in Lab 6.3
+frontend:
+  replicas: 3                  # mehr Kopien für Ausfallsicherheit
+  image:
+    tag: v1                    # prod startet mit v1; Upgrade auf v2 in Aufgabe 4
+backend:
+  replicas: 3

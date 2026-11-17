@@ -1,0 +1,62 @@
+# Frontend-Deployment mit Readiness- und Liveness-Probe (Lab 8.1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+  annotations:
+    kubernetes.io/change-cause: "Readiness- und Liveness-Probe auf /healthz"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0                      # ein alter Pod geht erst, wenn ein neuer bereit (ready) ist
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v2
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: hello-config
+          readinessProbe:                    # "Darf dieser Pod Anfragen bekommen?" Nein -> raus aus dem Service
+            httpGet:
+              path: /healthz                 # prüft nur das Frontend selbst, nicht das Backend
+              port: 80
+            periodSeconds: 5                 # alle 5 Sekunden prüfen
+            failureThreshold: 2              # nach 2 Fehlschlägen in Folge: nicht bereit
+          livenessProbe:                     # "Lebt der Container noch?" Nein -> Container neu starten
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10                # alle 10 Sekunden prüfen
+            failureThreshold: 3              # nach 3 Fehlschlägen in Folge (ca. 30 s): Neustart
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: admin-secret
+              mountPath: /etc/hello-secret
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: hello-data
+        - name: admin-secret
+          secret:
+            secretName: hello-secret

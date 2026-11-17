@@ -1,0 +1,31 @@
+# Lab 4.1: Frontend als ReplicaSet mit drei Kopien
+apiVersion: apps/v1                  # ReplicaSets gehören zur API-Gruppe "apps"
+kind: ReplicaSet
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  replicas: 3                        # Soll: drei laufende Pods
+  selector:                          # welche Pods zählt das ReplicaSet als "seine"?
+    matchLabels:                     # alle mit genau diesen Labels (ohne version)
+      app: hello
+      tier: frontend
+  template:                          # Bauplan für jeden neuen Pod
+    metadata:
+      labels:                        # müssen zum Selector passen, sonst lehnt die API ab
+        app: hello
+        tier: frontend
+        version: v1
+    spec:                            # wie spec eines Pods; Sidecar aus Lab 3.2 hier weggelassen
+      containers:
+        - name: frontend
+          image: hello-frontend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              # Platzhalter: eigene Pod-IP des Backends eintragen (ab Lab 4.2: http://backend)
+              value: "http://10.1.0.23"

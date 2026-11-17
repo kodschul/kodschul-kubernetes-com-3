@@ -1,0 +1,10 @@
+# Starter Lab 9.2 – feste Werte durch .Values ersetzen (siehe TODO)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config          # z. B. hello-config
+  labels:
+    {{- include "hello.labels" . | nindent 4 }}
+data:
+  BACKEND_URL: "http://{{ .Release.Name }}-backend"   # Service des Backends aus diesem Release
+  APP_COLOR: "lightyellow"                             # TODO: Wert "color" aus values.yaml, mit | quote

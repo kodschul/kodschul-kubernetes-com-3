@@ -1,0 +1,28 @@
+# Plattform-Teil (Lab 5.3): Namespace, GatewayClass und Gateway
+# Voraussetzung: Envoy Gateway v1.10.0 ist installiert (bringt die Gateway-API-CRDs mit).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateway                 # eigener Namespace für den gemeinsamen Eingang
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass              # "welche Software" setzt Gateways um (clusterweit, ohne Namespace)
+metadata:
+  name: eg
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller   # Envoy Gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway                   # der Eingang: Port, Protokoll, welche Routen andocken dürfen
+metadata:
+  name: hello-gateway
+  namespace: gateway
+spec:
+  gatewayClassName: eg          # verweist auf die GatewayClass oben
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80                  # Docker Desktop: erreichbar auf localhost:80
+      allowedRoutes:
+        namespaces:
+          from: All             # Routen aus allen Namespaces dürfen andocken

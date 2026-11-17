@@ -1,0 +1,9 @@
+# Starter Lab 9.3 – Werte für dev (Namespace hello-dev); nur was von hello/values.yaml abweicht
+host: hello.localhost          # TODO: eigener Host für dev: dev.hello.localhost
+color: lightyellow             # TODO: Farbe von dev aus Lab 6.3 (lightgreen)
+frontend:
+  replicas: 2                  # TODO: 1 Kopie reicht für dev
+  image:
+    tag: ""                    # TODO: dev startet mit v1
+backend:
+  replicas: 2                  # TODO: 1 Kopie

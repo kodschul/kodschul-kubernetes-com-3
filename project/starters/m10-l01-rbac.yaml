@@ -1,0 +1,46 @@
+# Starter Lab 10.1 – Rollen und Bindungen für anna (hello-dev) und ben (hello-prod)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployer
+  namespace: hello-dev
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "deployments/scale", "replicasets"]   # deployments/scale: kubectl scale
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: anna-deployer
+  namespace: hello-dev
+subjects:
+  - kind: User
+    name: anna
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: deployer
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: viewer
+  namespace: hello-prod
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: []                               # TODO: nur lesende Verben eintragen
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "services", "configmaps"]
+    verbs: []                               # TODO: nur lesende Verben eintragen
+---
+# TODO: RoleBinding "ben-viewer" im Namespace hello-prod ergänzen,
+#       das die Role viewer an den Benutzer ben bindet (Aufbau wie anna-deployer oben)

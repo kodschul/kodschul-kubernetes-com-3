@@ -1,0 +1,11 @@
+# ConfigMap der Umgebung dev (Lab 6.3): nur diese Datei unterscheidet sich von prod
+# Anwenden mit: kubectl apply -n hello-dev -f ...
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-config            # gleicher Name in jeder Umgebung, die Manifeste bleiben gleich
+  labels:
+    app: hello
+data:
+  BACKEND_URL: http://backend   # löst im eigenen Namespace auf: backend.hello-dev
+  APP_COLOR: lightgreen

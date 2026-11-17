@@ -1,0 +1,14 @@
+# Lab 10.2 – Test-Pod mit curl, läuft als ServiceAccount hello-reader
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api-test
+  namespace: hello
+  labels:
+    app: api-test
+spec:
+  serviceAccountName: hello-reader          # ohne diese Zeile: ServiceAccount "default"
+  containers:
+    - name: curl
+      image: curlimages/curl:8.23.0
+      command: ["sleep", "3600"]            # Pod läuft eine Stunde, Befehle per kubectl exec

@@ -1,0 +1,32 @@
+# Lab 4.2: Frontend als Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v1
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              # fester Name statt Pod-IP; der Service "backend" dazu folgt in Lab 5.1,
+              # bis dahin zeigt die Seite "Backend nicht erreichbar"
+              value: "http://backend"

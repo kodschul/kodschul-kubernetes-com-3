@@ -1,0 +1,9 @@
+Hello-App installiert: Release "{{ .Release.Name }}" im Namespace "{{ .Release.Namespace }}" (Chart {{ .Chart.Name }}-{{ .Chart.Version }}).
+
+Über das Gateway:
+  http://{{ .Values.host }}
+  http://{{ .Values.host }}/api
+
+Ohne Gateway:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ .Release.Name }}-frontend 8080:80
+  danach http://localhost:8080

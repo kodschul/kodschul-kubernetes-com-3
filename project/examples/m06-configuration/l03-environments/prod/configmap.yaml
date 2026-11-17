@@ -1,0 +1,11 @@
+# ConfigMap der Umgebung prod (Lab 6.3)
+# Anwenden mit: kubectl apply -n hello-prod -f ...
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-config
+  labels:
+    app: hello
+data:
+  BACKEND_URL: http://backend   # löst im eigenen Namespace auf: backend.hello-prod
+  APP_COLOR: lightblue

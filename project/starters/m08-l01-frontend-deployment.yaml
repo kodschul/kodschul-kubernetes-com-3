@@ -1,0 +1,64 @@
+# Lab 8.1 – Starter: Frontend-Deployment mit Probes
+# Ersetzt playground/k8s/frontend-deployment.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+  annotations:
+    kubernetes.io/change-cause: "Readiness- und Liveness-Probe auf /healthz"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v2
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: hello-config
+          readinessProbe:
+            httpGet:
+              path: # TODO: Health-Endpunkt der App
+              port: 80
+            periodSeconds: # TODO: alle 5 Sekunden
+            failureThreshold: # TODO: nach 2 Fehlschlägen nicht bereit
+          livenessProbe:
+            httpGet:
+              path: # TODO: Health-Endpunkt der App
+              port: 80
+            periodSeconds: # TODO: alle 10 Sekunden
+            failureThreshold: # TODO: nach 3 Fehlschlägen Neustart
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: admin-secret
+              mountPath: /etc/hello-secret
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: hello-data
+        - name: admin-secret
+          secret:
+            secretName: hello-secret

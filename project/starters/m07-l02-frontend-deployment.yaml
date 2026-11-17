@@ -1,0 +1,52 @@
+# Lab 7.2 – Starter: Frontend-Deployment mit access.log auf dem PVC
+# Ersetzt playground/k8s/frontend-deployment.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+  annotations:
+    kubernetes.io/change-cause: "access.log auf PVC hello-data"
+spec:
+  replicas: 1                                # TODO (Aufgabe 4): auf 3 erhöhen
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v2
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: hello-config
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: admin-secret
+              mountPath: /etc/hello-secret
+              readOnly: true
+      volumes:
+        - name: data
+          # TODO: emptyDir durch persistentVolumeClaim mit claimName hello-data ersetzen
+          emptyDir: {}
+        - name: admin-secret
+          secret:
+            secretName: hello-secret

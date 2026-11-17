@@ -1,0 +1,61 @@
+# Standardwerte des Charts hello.
+# Überschreiben: helm install ... --set color=pink   oder   -f eigene-werte.yaml
+
+frontend:
+  replicas: 2
+  image:
+    repository: hello-frontend
+    tag: ""                    # leer = appVersion aus Chart.yaml (v2)
+    pullPolicy: Never          # lokal gebautes Image (Lab 1.3), nie aus einer Registry laden
+  resources:                   # aus Lab 8.2
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 128Mi
+
+backend:
+  replicas: 2
+  image:
+    repository: hello-backend
+    tag: v1
+    pullPolicy: Never
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+# Hintergrundfarbe der Seite (landet in der ConfigMap, Lab 6.1)
+color: lightyellow
+
+# Hostname der HTTPRoute (Lab 5.3)
+host: hello.localhost
+
+# Gateway, an das sich die HTTPRoute hängt; das Gateway selbst gehört nicht zum Chart
+gateway:
+  name: hello-gateway
+  namespace: gateway
+
+# Name eines vorhandenen Secrets mit dem Schlüssel admin-password (Lab 6.2).
+# Das Chart legt kein Secret an; fehlt es, startet der Pod trotzdem (optional: true).
+existingSecret: hello-secret
+
+# Speicher für /data (Lab 7.2); enabled: false = emptyDir statt PVC
+persistence:
+  enabled: true
+  size: 1Gi
+
+# Lab 10.3: Port im Container. Images bis v2 lauschen auf 80, die *-nonroot-Images auf 8080.
+containerPort: 80
+
+# Lab 10.3: securityContext für den Pod (gilt für alle Container und Volumes)
+# Beispiel: fsGroup: 10001  (Volumes gehören dann der Gruppe 10001, wenn der Speichertyp das unterstützt)
+podSecurityContext: {}
+
+# Lab 10.3: securityContext für jeden Container; {} = Standard der Laufzeit (root erlaubt)
+# Werte für Pod Security "restricted" stehen in values-prod.yaml
+securityContext: {}

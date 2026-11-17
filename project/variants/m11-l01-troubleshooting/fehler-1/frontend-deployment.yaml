@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: hello-debug
+  labels:
+    app: hello
+    tier: frontend
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v1
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          envFrom:                      # alle Schlüssel der ConfigMap als Umgebungsvariablen (Lab 6.1)
+            - configMapRef:
+                name: hello-config
+          readinessProbe:               # Traffic erst, wenn /healthz antwortet (Lab 8.1)
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 2

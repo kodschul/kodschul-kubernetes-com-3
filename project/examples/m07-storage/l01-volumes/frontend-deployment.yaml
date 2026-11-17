@@ -1,0 +1,49 @@
+# Frontend-Deployment mit Volume "data" für access.log (Lab 7.1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+  annotations:
+    kubernetes.io/change-cause: "access.log im emptyDir-Volume data"
+spec:
+  replicas: 1                                # nur ein Pod: jede Beobachtung trifft dieselbe Datei (Lab 7.2 skaliert wieder auf 3)
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v2
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: hello-config
+          volumeMounts:
+            - name: data                     # Volume "data" (unten) ...
+              mountPath: /data               # ... erscheint im Container als Ordner /data (dort schreibt die App access.log)
+            - name: admin-secret
+              mountPath: /etc/hello-secret
+              readOnly: true
+      volumes:
+        - name: data
+          emptyDir: {}                       # leerer Ordner auf dem Node: überlebt Container-Neustarts, nicht das Löschen des Pods
+        - name: admin-secret
+          secret:
+            secretName: hello-secret

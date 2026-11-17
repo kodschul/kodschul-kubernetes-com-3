@@ -1,0 +1,19 @@
+# Service "frontend" vom Typ LoadBalancer: Hello-Seite von außen erreichbar (Lab 5.2)
+# Docker Desktop: http://localhost:8080
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  type: LoadBalancer            # Cloud: externer Load Balancer mit eigener IP; Docker Desktop: localhost
+  selector:
+    app: hello
+    tier: frontend
+  ports:
+    - port: 8080                # Port nach außen (localhost:8080)
+      targetPort: 80            # Port im Frontend-Container
+      protocol: TCP
+      # nodePort wird automatisch aus 30000-32767 vergeben (kubectl get svc zeigt ihn)

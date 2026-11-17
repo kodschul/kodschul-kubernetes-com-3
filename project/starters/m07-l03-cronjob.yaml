@@ -1,0 +1,37 @@
+# Lab 7.3 – Starter: CronJob für die Sicherung von access.log
+# Kopieren nach playground/k8s/cronjob.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/cronjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello-backup
+  labels:
+    app: hello
+spec:
+  schedule: # TODO: Cron-Ausdruck für "alle 2 Minuten", in Anführungszeichen
+  concurrencyPolicy: # TODO: kein neuer Lauf, solange der vorige noch läuft
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app: hello
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: backup
+              image: busybox:1.37
+              command:
+                - /bin/sh
+                - -c
+                - mkdir -p /data/backup && cp /data/access.log /data/backup/access-$(date +%H%M%S).log && ls /data/backup
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: # TODO: PVC aus Lab 7.2

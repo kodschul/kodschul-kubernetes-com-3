@@ -1,0 +1,24 @@
+# Lab 8.3 – Starter: HorizontalPodAutoscaler für das Frontend
+# Kopieren nach playground/k8s/hpa.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: # TODO: Deployment, das skaliert wird
+  minReplicas: # TODO: mindestens 1 Pod
+  maxReplicas: # TODO: höchstens 5 Pods
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: # TODO: Ziel 50 (Prozent des CPU-Requests)

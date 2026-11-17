@@ -1,0 +1,15 @@
+# Lab 3.4 – Fehlerbild 2: Container startet und beendet sich sofort (absichtlich fehlerhaft)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fehler-crash
+  labels:
+    lab: pod-errors
+spec:
+  containers:
+    - name: backend
+      image: hello-backend:v1
+      imagePullPolicy: Never
+      command: ["python", "server.py"]   # command ersetzt den Startbefehl (CMD) des Images
+      ports:
+        - containerPort: 80

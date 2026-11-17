@@ -1,0 +1,14 @@
+# Starter Lab 10.2 – Test-Pod mit curl
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api-test
+  namespace: hello
+  labels:
+    app: api-test
+spec:
+  # TODO: serviceAccountName auf hello-reader setzen
+  containers:
+    - name: curl
+      image: curlimages/curl:8.23.0
+      command: ["sleep", "3600"]

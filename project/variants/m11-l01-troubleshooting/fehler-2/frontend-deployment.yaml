@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: hello-debug
+  labels:
+    app: hello
+    tier: frontend
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v1
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:                          # einzelne Schlüssel der ConfigMap als Umgebungsvariablen
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: hello-config
+                  key: BACKEND_URL
+            - name: APP_COLOR
+              valueFrom:
+                configMapKeyRef:
+                  name: hello-config
+                  key: APP_COLOR
+          readinessProbe:               # Traffic erst, wenn /healthz antwortet (Lab 8.1)
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 2

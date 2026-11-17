@@ -1,0 +1,46 @@
+# Gemeinsames Frontend-Deployment für hello-dev und hello-prod (Lab 6.3, Stand Lab 6.2)
+# Kein namespace-Feld: der Namespace kommt beim Anwenden über -n.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+  annotations:
+    kubernetes.io/change-cause: "Admin-Passwort aus Secret hello-secret"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v2
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: hello-config
+          volumeMounts:
+            - name: admin-secret             # Name des Volumes unten
+              mountPath: /etc/hello-secret   # Ordner im Container; je Schlüssel eine Datei
+              readOnly: true                 # die App darf die Datei nur lesen
+      volumes:
+        - name: admin-secret
+          secret:
+            secretName: hello-secret         # ergibt die Datei /etc/hello-secret/admin-password

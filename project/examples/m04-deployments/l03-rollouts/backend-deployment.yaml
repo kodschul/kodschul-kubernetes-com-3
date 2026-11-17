@@ -1,0 +1,29 @@
+# Lab 4.3: Backend unverändert aus Lab 4.2
+# Vorlage erzeugt mit:
+#   kubectl create deployment backend --image=hello-backend:v1 --port=80 --dry-run=client -o yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: hello
+    tier: backend
+spec:
+  replicas: 3                        # Soll: drei Pods (das Deployment legt dafür ein ReplicaSet an)
+  selector:
+    matchLabels:                     # Selector: app + tier, nie version
+      app: hello
+      tier: backend
+  template:                          # Pod-Bauplan, wie beim ReplicaSet
+    metadata:
+      labels:
+        app: hello
+        tier: backend
+        version: v1
+    spec:
+      containers:
+        - name: backend
+          image: hello-backend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80

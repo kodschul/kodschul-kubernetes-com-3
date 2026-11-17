@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-backend           # Release-Name als Präfix: hello-backend
+  labels:
+    {{- include "hello.labels" . | nindent 4 }}
+    tier: backend
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      {{- include "hello.selectorLabels" . | nindent 6 }}
+      tier: backend
+  template:
+    metadata:
+      labels:
+        {{- include "hello.selectorLabels" . | nindent 8 }}
+        tier: backend
+        version: {{ .Values.backend.image.tag | quote }}
+    spec:
+      automountServiceAccountToken: false      # Lab 10.2: die App spricht nie mit der Kubernetes-API
+      securityContext:                         # Lab 10.3: Pod-Ebene
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          securityContext:                     # Lab 10.3: Container-Ebene
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            - name: PORT                       # die App lauscht auf dem Port aus values.yaml
+              value: {{ .Values.containerPort | quote }}
+          ports:
+            - name: http                       # Probes und Service verweisen auf diesen Namen
+              containerPort: {{ .Values.containerPort }}
+          readinessProbe:                      # Lab 8.1
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:                           # ganzer Block aus values.yaml, als YAML eingerückt
+            {{- toYaml .Values.backend.resources | nindent 12 }}

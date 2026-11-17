@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-frontend
+  labels:
+    {{- include "hello.labels" . | nindent 4 }}
+    tier: frontend
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      {{- include "hello.selectorLabels" . | nindent 6 }}
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        {{- include "hello.selectorLabels" . | nindent 8 }}
+        tier: frontend
+        version: {{ .Values.frontend.image.tag | default .Chart.AppVersion | quote }}
+    spec:
+      automountServiceAccountToken: false      # Lab 10.2: die App spricht nie mit der Kubernetes-API
+      securityContext:                         # Lab 10.3: Pod-Ebene
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: frontend
+          # leerer Tag in values.yaml -> appVersion aus Chart.yaml
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+          securityContext:                     # Lab 10.3: Container-Ebene
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            - name: PORT                       # die App lauscht auf dem Port aus values.yaml
+              value: {{ .Values.containerPort | quote }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+          envFrom:                             # BACKEND_URL und APP_COLOR aus der ConfigMap
+            - configMapRef:
+                name: {{ .Release.Name }}-config
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.frontend.resources | nindent 12 }}
+          volumeMounts:
+            - name: data                       # access.log
+              mountPath: /data
+            - name: hello-secret               # Datei admin-password
+              mountPath: /etc/hello-secret
+              readOnly: true
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: hello-secret
+          secret:
+            secretName: {{ .Values.existingSecret }}
+            optional: true                     # Pod startet auch ohne Secret

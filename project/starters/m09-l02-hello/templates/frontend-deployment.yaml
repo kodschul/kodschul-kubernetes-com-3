@@ -1,0 +1,64 @@
+# Starter Lab 9.2 – feste Werte durch .Values ersetzen (siehe TODO)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-frontend
+  labels:
+    {{- include "hello.labels" . | nindent 4 }}
+    tier: frontend
+spec:
+  replicas: 2                                  # TODO: Wert aus values.yaml (frontend.replicas)
+  selector:
+    matchLabels:
+      {{- include "hello.selectorLabels" . | nindent 6 }}
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        {{- include "hello.selectorLabels" . | nindent 8 }}
+        tier: frontend
+        version: "v2"                          # TODO: derselbe Ausdruck wie beim Tag, mit | quote
+    spec:
+      containers:
+        - name: frontend
+          # TODO: Repository und Tag aus values.yaml; leerer Tag -> appVersion (Funktion default)
+          image: "hello-frontend:v2"
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+          envFrom:                             # BACKEND_URL und APP_COLOR aus der ConfigMap
+            - configMapRef:
+                name: {{ .Release.Name }}-config
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.frontend.resources | nindent 12 }}
+          volumeMounts:
+            - name: data                       # access.log
+              mountPath: /data
+            - name: hello-secret               # Datei admin-password
+              mountPath: /etc/hello-secret
+              readOnly: true
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: hello-secret
+          secret:
+            secretName: {{ .Values.existingSecret }}
+            optional: true                     # Pod startet auch ohne Secret

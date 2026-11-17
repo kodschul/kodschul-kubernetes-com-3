@@ -1,0 +1,18 @@
+# Lab 3.3: Backend-Pod mit vollständigen Labels
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend
+  labels:                            # Schlüssel-Wert-Paare zum Filtern und Auswählen
+    app: hello                       # zu welcher Anwendung der Pod gehört
+    tier: backend                    # welche Schicht der Anwendung
+    version: v1                      # welche Version läuft
+  annotations:                       # Notizen am Objekt, nicht zum Filtern gedacht
+    description: "JSON-API der Hello-App"
+spec:
+  containers:
+    - name: backend
+      image: hello-backend:v1
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 80

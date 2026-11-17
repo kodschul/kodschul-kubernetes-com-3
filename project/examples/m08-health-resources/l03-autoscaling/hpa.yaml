@@ -1,0 +1,24 @@
+# HorizontalPodAutoscaler "frontend": 1 bis 5 Frontend-Pods, Ziel 50 % CPU (Lab 8.3)
+# Gleiche Wirkung per Befehl: kubectl autoscale deployment frontend --cpu=50% --min=1 --max=5
+# Voraussetzung: metrics-server läuft (kubectl top pods zeigt Werte)
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  scaleTargetRef:                   # welches Objekt skaliert wird
+    apiVersion: apps/v1
+    kind: Deployment
+    name: frontend
+  minReplicas: 1                    # nie weniger als 1 Pod
+  maxReplicas: 5                    # nie mehr als 5 Pods
+  metrics:
+    - type: Resource                # Messwert aus dem metrics-server (CPU oder Speicher)
+      resource:
+        name: cpu
+        target:
+          type: Utilization         # in Prozent des CPU-Requests (100m)
+          averageUtilization: 50    # Ziel: im Mittel 50 % = 50m je Pod

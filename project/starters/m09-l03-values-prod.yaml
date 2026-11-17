@@ -1,0 +1,9 @@
+# Starter Lab 9.3 – Werte für prod (Namespace hello-prod); nur was von hello/values.yaml abweicht
+host: hello.localhost          # TODO: eigener Host für prod: prod.hello.localhost
+color: lightyellow             # TODO: Farbe von prod aus Lab 6.3 (lightblue)
+frontend:
+  replicas: 2                  # TODO: 3 Kopien
+  image:
+    tag: ""                    # TODO: prod startet ebenfalls mit v1
+backend:
+  replicas: 2                  # TODO: 3 Kopien

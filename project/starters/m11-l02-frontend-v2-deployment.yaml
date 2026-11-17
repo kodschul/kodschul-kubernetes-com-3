@@ -1,0 +1,55 @@
+# Starter Lab 11.2 – Canary: zweites Frontend-Deployment mit Version v2 neben dem Helm-Release "hello" (Lab 11.2)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-v2
+  namespace: hello
+  labels:
+    app: hello-canary                   # bewusst nicht "hello": der Service hello-frontend soll diese Pods nicht erfassen
+    tier: frontend
+    version: v2
+spec:
+  replicas: 1                           # ein Canary-Pod reicht; der Anteil kommt aus dem Gewicht der Route
+  selector:
+    matchLabels:
+      app: hello-canary
+      tier: frontend
+      # TODO: Label version mit dem Wert v2 ergänzen (nur v2-Pods)
+  template:
+    metadata:
+      labels:
+        app: hello-canary
+        tier: frontend
+        # TODO: Label version mit dem Wert v2 ergänzen
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v1      # TODO: Image der neuen Version eintragen
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: hello-config      # dieselbe ConfigMap wie das Helm-Release: gleiches Backend
+          env:                          # env schlägt envFrom: v2 bekommt eine eigene Farbe
+            - name: APP_COLOR
+              value: lightgreen
+          readinessProbe:               # erst Traffic, wenn v2 bereit ist (Lab 8.1)
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 2
+          resources:                    # Werte aus Lab 8.2
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data          # access.log des Canary bleibt getrennt vom PVC des Releases
+      volumes:
+        - name: data
+          emptyDir: {}

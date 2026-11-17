@@ -1,0 +1,19 @@
+# Eigener Service für v2, damit die Route ihn getrennt ansprechen kann (Lab 11.2)
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-v2
+  namespace: hello
+  labels:
+    app: hello-canary
+    tier: frontend
+    version: v2
+spec:
+  type: ClusterIP
+  selector:                             # wählt nur die v2-Pods aus frontend-v2-deployment.yaml
+    app: hello-canary
+    tier: frontend
+    version: v2
+  ports:
+    - port: 80
+      targetPort: 80

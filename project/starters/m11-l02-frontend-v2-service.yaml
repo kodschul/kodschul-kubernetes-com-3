@@ -1,0 +1,17 @@
+# Starter Lab 11.2 – eigener Service für v2, damit die Route ihn getrennt ansprechen kann (Lab 11.2)
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-v2
+  namespace: hello
+  labels:
+    app: hello-canary
+    tier: frontend
+    version: v2
+spec:
+  type: ClusterIP
+  selector:
+    # TODO: dieselben drei Labels wie im Selector des Deployments frontend-v2
+  ports:
+    - port: 80
+      targetPort: 80

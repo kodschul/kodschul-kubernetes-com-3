@@ -1,0 +1,23 @@
+# Basisimage: Python 3.14 auf Alpine Linux (klein, aktuell unterstützt)
+FROM python:3.14-alpine
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app.py .
+
+# Eigener Benutzer ohne root-Rechte (UID 10001) und ein Datenordner, der ihm gehört
+RUN adduser -D -u 10001 hello && mkdir -p /data && chown 10001 /data
+USER 10001
+
+# Version und Farbe dieses Images; für v2: APP_VERSION=v2, APP_COLOR=lightgreen
+ENV APP_VERSION=v1 \
+    APP_COLOR=lightblue \
+    PORT=8080
+
+# Ports unter 1024 brauchen root-Rechte, deshalb 8080
+EXPOSE 8080
+
+CMD ["python", "app.py"]

@@ -1,0 +1,46 @@
+# Backend-Deployment mit Probes (Lab 8.1) und Requests/Limits (Lab 8.2)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: hello
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: backend
+        version: v1
+    spec:
+      containers:
+        - name: backend
+          image: hello-backend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          resources:
+            requests:                        # Planung: so viel reserviert der Scheduler auf dem Node
+              cpu: 50m                       # 50 Millicores = 5 % eines CPU-Kerns
+              memory: 64Mi                   # 64 Mebibyte
+            limits:                          # Obergrenze zur Laufzeit
+              cpu: 200m                      # mehr CPU -> Container wird gebremst (gedrosselt)
+              memory: 128Mi                  # mehr Speicher -> Container wird beendet (OOMKilled)
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 3

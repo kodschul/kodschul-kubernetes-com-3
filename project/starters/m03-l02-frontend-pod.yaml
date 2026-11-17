@@ -1,0 +1,28 @@
+# Lab 3.2 – Starter: Frontend-Pod mit Sidecar "log-reader"
+# Kopieren nach playground/k8s/frontend-pod.yaml (ersetzt die Datei aus Lab 3.1).
+# Vorher die eigene Backend-IP aus der alten Datei notieren und unten wieder eintragen.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  initContainers:
+    - name: log-reader
+      image: busybox:1.37
+      # TODO: restartPolicy so setzen, dass der Container als Sidecar weiterläuft
+      command: ["sh", "-c", "touch /data/access.log && tail -F /data/access.log"]
+      # TODO: Volume "data" unter /data einhängen (volumeMounts)
+  containers:
+    - name: frontend
+      image: hello-frontend:v1
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 80
+      env:
+        - name: BACKEND_URL
+          value: "http://10.1.0.23"   # TODO: eigene Pod-IP des Backends eintragen
+      # TODO: Volume "data" unter /data einhängen (volumeMounts)
+  # TODO: Abschnitt volumes mit einem emptyDir-Volume namens "data" ergänzen

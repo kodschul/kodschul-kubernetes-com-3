@@ -1,0 +1,39 @@
+# Backend-Deployment mit Readiness- und Liveness-Probe (Lab 8.1)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: hello
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: backend
+        version: v1
+    spec:
+      containers:
+        - name: backend
+          image: hello-backend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          readinessProbe:                    # "Darf dieser Pod Anfragen bekommen?" Nein -> raus aus dem Service
+            httpGet:
+              path: /healthz                 # Antwort 200-399 = bestanden
+              port: 80
+            periodSeconds: 5                 # alle 5 Sekunden prüfen
+            failureThreshold: 2              # nach 2 Fehlschlägen in Folge: nicht bereit
+          livenessProbe:                     # "Lebt der Container noch?" Nein -> Container neu starten
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10                # alle 10 Sekunden prüfen
+            failureThreshold: 3              # nach 3 Fehlschlägen in Folge (ca. 30 s): Neustart

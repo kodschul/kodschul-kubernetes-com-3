@@ -1,0 +1,36 @@
+# Lab 3.3: Frontend-Pod (mit Sidecar aus Lab 3.2) und vollständigen Labels
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend
+  labels:                            # Schlüssel-Wert-Paare zum Filtern und Auswählen
+    app: hello
+    tier: frontend
+    version: v1
+  annotations:                       # Notizen am Objekt, nicht zum Filtern gedacht
+    description: "Webseite der Hello-App, fragt das Backend"
+spec:
+  initContainers:
+    - name: log-reader
+      image: busybox:1.37
+      restartPolicy: Always          # nativer Sidecar (Lab 3.2)
+      command: ["sh", "-c", "touch /data/access.log && tail -F /data/access.log"]
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  containers:
+    - name: frontend
+      image: hello-frontend:v1
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 80
+      env:
+        - name: BACKEND_URL
+          # Platzhalter: eigene Pod-IP des Backends eintragen
+          value: "http://10.1.0.23"
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: data
+      emptyDir: {}

@@ -1,0 +1,60 @@
+# Lab 10.1 – Rechte für zwei Test-Identitäten:
+#   anna darf in hello-dev deployen (Role deployer)
+#   ben darf in hello-prod nur lesen (Role viewer)
+# Benutzer sind keine Kubernetes-Objekte: RBAC verweist nur auf ihren Namen.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role                                  # Rechte in genau einem Namespace
+metadata:
+  name: deployer
+  namespace: hello-dev
+rules:
+  - apiGroups: ["apps"]                     # Deployments und ReplicaSets liegen in der API-Gruppe apps
+    resources: ["deployments", "deployments/scale", "replicasets"]   # deployments/scale: kubectl scale
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]                         # "" = Kern-API: Pods, Services, ConfigMaps
+    resources: ["pods", "services", "configmaps"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods/log"]                 # Unterressource: kubectl logs
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding                           # verbindet die Role mit einer Identität
+metadata:
+  name: anna-deployer
+  namespace: hello-dev
+subjects:
+  - kind: User
+    name: anna
+    apiGroup: rbac.authorization.k8s.io
+roleRef:                                    # nach dem Anlegen nicht mehr änderbar
+  kind: Role
+  name: deployer
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: viewer
+  namespace: hello-prod
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]         # nur lesende Verben
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "services", "configmaps"]   # bewusst ohne secrets
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ben-viewer
+  namespace: hello-prod
+subjects:
+  - kind: User
+    name: ben
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: viewer
+  apiGroup: rbac.authorization.k8s.io

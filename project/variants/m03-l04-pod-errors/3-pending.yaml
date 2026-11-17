@@ -1,0 +1,17 @@
+# Lab 3.4 – Fehlerbild 3: Pod wird keinem Node zugeteilt (absichtlich fehlerhaft)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fehler-pending
+  labels:
+    lab: pod-errors
+spec:
+  containers:
+    - name: frontend
+      image: hello-frontend:v1
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 80
+      resources:
+        requests:                    # Reservierung: so viel muss auf dem Node frei sein (Lab 8.2)
+          cpu: "64"                  # 64 CPU-Kerne

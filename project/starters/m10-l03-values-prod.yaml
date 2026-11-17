@@ -1,0 +1,24 @@
+# Starter Lab 10.3 – Werte für prod unter Pod Security "restricted"
+host: prod.hello.localhost
+color: lightblue
+frontend:
+  replicas: 3
+  image:
+    tag: v1                    # TODO: Image ohne root (v1-nonroot)
+backend:
+  replicas: 3
+  image:
+    tag: v1                    # TODO: Image ohne root (v1-nonroot)
+
+containerPort: 80              # TODO: Port der nonroot-Images (8080)
+
+podSecurityContext:
+  fsGroup: 10001
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  # TODO: allowPrivilegeEscalation auf false setzen
+  # TODO: capabilities: drop: ["ALL"]
+  # TODO: seccompProfile: type: RuntimeDefault
+  readOnlyRootFilesystem: true

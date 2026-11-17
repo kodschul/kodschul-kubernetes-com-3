@@ -1,0 +1,48 @@
+# Lab 8.2 – Starter: Backend-Deployment mit Requests und Limits
+# Ersetzt playground/k8s/backend-deployment.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/backend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: hello
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: backend
+        version: v1
+    spec:
+      containers:
+        - name: backend
+          image: hello-backend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: # TODO: 50 Millicores
+              memory: # TODO: 64 Mebibyte
+            limits:
+              cpu: # TODO: 200 Millicores
+              memory: # TODO: 128 Mebibyte
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 3

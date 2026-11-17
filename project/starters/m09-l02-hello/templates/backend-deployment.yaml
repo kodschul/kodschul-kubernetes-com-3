@@ -1,0 +1,42 @@
+# Starter Lab 9.2 – feste Werte durch .Values ersetzen (siehe TODO)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-backend           # Release-Name als Präfix: hello-backend
+  labels:
+    {{- include "hello.labels" . | nindent 4 }}
+    tier: backend
+spec:
+  replicas: 2                                  # TODO: Wert aus values.yaml (backend.replicas)
+  selector:
+    matchLabels:
+      {{- include "hello.selectorLabels" . | nindent 6 }}
+      tier: backend
+  template:
+    metadata:
+      labels:
+        {{- include "hello.selectorLabels" . | nindent 8 }}
+        tier: backend
+        version: "v1"                          # TODO: Tag aus values.yaml
+    spec:
+      containers:
+        - name: backend
+          image: "hello-backend:v1"            # TODO: Repository und Tag aus values.yaml (backend.image.…)
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - name: http                       # Probes und Service verweisen auf diesen Namen
+              containerPort: 80
+          readinessProbe:                      # Lab 8.1
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:                           # ganzer Block aus values.yaml, als YAML eingerückt
+            {{- toYaml .Values.backend.resources | nindent 12 }}

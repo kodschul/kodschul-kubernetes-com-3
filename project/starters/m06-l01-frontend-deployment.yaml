@@ -1,0 +1,38 @@
+# Lab 6.1 – Starter: Frontend-Deployment mit envFrom
+# Ersetzt playground/k8s/frontend-deployment.yaml, TODO ergänzen, dann:
+#   kubectl apply -f playground/k8s/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+  annotations:
+    kubernetes.io/change-cause: "Konfiguration aus ConfigMap hello-config"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v2
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          # TODO: Der env-Block mit BACKEND_URL ist entfernt.
+          #       Ergänze envFrom mit einem configMapRef auf die ConfigMap hello-config.

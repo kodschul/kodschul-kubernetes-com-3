@@ -1,0 +1,33 @@
+# Lab 4.2 – Starter: Frontend als Deployment
+# Kopieren nach playground/k8s/frontend-deployment.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/frontend-deployment.yaml
+apiVersion: apps/v1
+# TODO: kind eintragen
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v1
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              # TODO: statt einer Pod-IP den festen Namen http://backend eintragen
+              value: ""

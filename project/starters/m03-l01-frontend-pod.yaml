@@ -1,0 +1,19 @@
+# Lab 3.1 – Starter: Frontend der Hello-App als Pod
+# Kopieren nach playground/k8s/frontend-pod.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/frontend-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  containers:
+    - name: frontend
+      image: hello-frontend:v1
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 80
+      # TODO: Abschnitt env mit der Variablen BACKEND_URL ergänzen;
+      #       Wert: http://<Pod-IP des Backends> (kubectl get pod backend -o wide, Spalte IP)

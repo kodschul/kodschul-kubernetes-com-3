@@ -1,0 +1,11 @@
+# ConfigMap "hello-config": Einstellungen der Umgebung, nicht des Images (Lab 6.1)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-config
+  labels:
+    app: hello
+data:                           # Schlüssel: Wert, Werte immer als Text
+  BACKEND_URL: http://backend   # wohin das Frontend fragt
+  APP_COLOR: lightyellow        # Hintergrundfarbe; überschreibt APP_COLOR aus dem Dockerfile
+# APP_VERSION bleibt bewusst im Image: die Version beschreibt den Code im Image.

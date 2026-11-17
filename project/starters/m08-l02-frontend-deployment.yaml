@@ -1,0 +1,71 @@
+# Lab 8.2 – Starter: Frontend-Deployment mit Requests und Limits
+# Ersetzt playground/k8s/frontend-deployment.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+  annotations:
+    kubernetes.io/change-cause: "Requests und Limits"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v2
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: hello-config
+          resources:
+            requests:
+              cpu: # TODO: 100 Millicores
+              memory: # TODO: 64 Mebibyte
+            limits:
+              cpu: # TODO: 500 Millicores
+              memory: # TODO: 128 Mebibyte
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: admin-secret
+              mountPath: /etc/hello-secret
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: hello-data
+        - name: admin-secret
+          secret:
+            secretName: hello-secret

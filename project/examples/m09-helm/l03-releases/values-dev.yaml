@@ -1,0 +1,10 @@
+# Werte für die Umgebung dev (Namespace hello-dev). Alles andere kommt aus hello/values.yaml.
+# Installation: helm upgrade --install hello ./hello -n hello-dev -f values-dev.yaml
+host: dev.hello.localhost      # eigene Adresse über dasselbe Gateway
+color: lightgreen              # wie in Lab 6.3
+frontend:
+  replicas: 1
+  image:
+    tag: v1                    # dev startet mit v1
+backend:
+  replicas: 1

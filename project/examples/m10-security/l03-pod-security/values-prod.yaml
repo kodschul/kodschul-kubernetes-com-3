@@ -1,0 +1,27 @@
+# Lab 10.3 – Werte für prod (Namespace hello-prod) unter Pod Security "restricted".
+# Aufruf aus project/: helm upgrade --install hello playground/hello -n hello-prod -f playground/values-prod.yaml
+host: prod.hello.localhost
+color: lightblue
+frontend:
+  replicas: 3
+  image:
+    tag: v1-nonroot            # Image mit USER 10001 und Port 8080 (Lab 10.3)
+backend:
+  replicas: 3
+  image:
+    tag: v1-nonroot
+
+containerPort: 8080            # Ports unter 1024 brauchen root-Rechte
+
+podSecurityContext:
+  fsGroup: 10001               # Volumes gehören der Gruppe 10001 (wo der Speichertyp das unterstützt)
+
+securityContext:
+  runAsNonRoot: true           # Start verweigern, wenn das Image als root laufen würde
+  runAsUser: 10001             # Benutzer-ID aus dem Dockerfile (USER 10001)
+  allowPrivilegeEscalation: false   # kein Rechtegewinn über setuid-Programme
+  capabilities:
+    drop: ["ALL"]              # alle Sonderrechte des Linux-Kernels abgeben
+  seccompProfile:
+    type: RuntimeDefault       # Standard-Filter für Systemaufrufe der Container-Laufzeit
+  readOnlyRootFilesystem: true # Dateisystem des Images nur lesbar; schreiben nur in /data

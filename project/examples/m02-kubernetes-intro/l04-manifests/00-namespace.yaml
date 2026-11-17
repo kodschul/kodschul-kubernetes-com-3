@@ -1,0 +1,8 @@
+# Lab 2.4: Namespace der Hello-App
+# Anwenden:  kubectl apply -f examples/m02-kubernetes-intro/l04-manifests/
+# Danach als Standard im Kontext setzen:
+#   kubectl config set-context --current --namespace=hello
+apiVersion: v1          # API-Gruppe/Version des Objekttyps (Namespace gehört zur Kern-API "v1")
+kind: Namespace         # Objekttyp
+metadata:
+  name: hello           # Name des Namespace; im Cluster eindeutig

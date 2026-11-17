@@ -1,0 +1,17 @@
+# Lab 3.1 – Starter: Backend der Hello-App als Pod
+# Kopieren nach playground/k8s/backend-pod.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/backend-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend
+  labels:
+    app: hello
+    tier: backend
+spec:
+  containers:
+    - name: backend
+      # TODO: Image hello-backend:v1 eintragen (Feld image)
+      # TODO: imagePullPolicy so setzen, dass nur das lokale Image genutzt wird
+      ports:
+        - containerPort: 80

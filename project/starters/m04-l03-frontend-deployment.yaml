@@ -1,0 +1,34 @@
+# Lab 4.3 – Starter: Frontend-Deployment mit Rollout-Strategie (Stand Lab 4.2)
+# Kopieren nach playground/k8s/frontend-deployment.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+  # TODO: Annotation kubernetes.io/change-cause mit dem Wert "Start mit v1" ergänzen
+spec:
+  replicas: 3
+  # TODO: strategy ergänzen: type RollingUpdate mit maxSurge 1 und maxUnavailable 0
+  selector:
+    matchLabels:
+      app: hello
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: frontend
+        version: v1
+    spec:
+      containers:
+        - name: frontend
+          image: hello-frontend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              value: "http://backend"

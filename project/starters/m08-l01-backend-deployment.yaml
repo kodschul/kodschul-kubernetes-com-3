@@ -1,0 +1,30 @@
+# Lab 8.1 – Starter: Backend-Deployment mit Probes
+# Ersetzt playground/k8s/backend-deployment.yaml, TODO ergänzen, dann:
+#   kubectl apply -f playground/k8s/backend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: hello
+    tier: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: hello
+        tier: backend
+        version: v1
+    spec:
+      containers:
+        - name: backend
+          image: hello-backend:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          # TODO: readinessProbe und livenessProbe wie im Frontend (gleiche Werte, gleicher Pfad /healthz)

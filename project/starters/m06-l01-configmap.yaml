@@ -1,0 +1,12 @@
+# Lab 6.1 – Starter: ConfigMap hello-config
+# Kopieren nach playground/k8s/configmap.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-config
+  labels:
+    app: hello
+data:
+  # TODO: BACKEND_URL mit der Adresse des Backend-Service
+  # TODO: APP_COLOR mit der Farbe lightyellow

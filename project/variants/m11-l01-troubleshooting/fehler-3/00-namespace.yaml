@@ -1,0 +1,5 @@
+# Eigener Namespace für die Fehlersuche (Lab 11.1); "00-" sorgt dafür, dass kubectl apply ihn zuerst anlegt
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-debug

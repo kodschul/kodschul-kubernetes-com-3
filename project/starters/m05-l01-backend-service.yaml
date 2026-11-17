@@ -1,0 +1,18 @@
+# Lab 5.1 – Starter: Service backend
+# Kopieren nach playground/k8s/backend-service.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/backend-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  labels:
+    app: hello
+    tier: backend
+spec:
+  type: ClusterIP
+  selector:
+    # TODO: dieselben Labels wie im Selector des Backend-Deployments eintragen (app und tier)
+  ports:
+    - port: 80
+      # TODO: targetPort = Port im Backend-Container
+      protocol: TCP

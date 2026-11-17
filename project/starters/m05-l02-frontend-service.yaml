@@ -1,0 +1,18 @@
+# Lab 5.2 – Starter: Service frontend von außen
+# Kopieren nach playground/k8s/frontend-service.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/frontend-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  type: NodePort                # TODO (Aufgabe 3): auf LoadBalancer umstellen
+  selector:
+    # TODO: Labels der Frontend-Pods eintragen (app und tier)
+  ports:
+    - port: 8080                # Port des Service
+      targetPort: 80            # Port im Frontend-Container
+      protocol: TCP

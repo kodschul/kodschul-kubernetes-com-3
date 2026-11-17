@@ -1,0 +1,12 @@
+# Lab 6.3 – Starter: Namespaces hello-dev und hello-prod
+# Kopieren nach playground/k8s/namespaces.yaml, TODOs ergänzen, dann:
+#   kubectl apply -f playground/k8s/namespaces.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-dev
+  labels:
+    app: hello
+    environment: dev
+---
+# TODO: zweiter Namespace hello-prod mit den Labels app: hello und environment: prod

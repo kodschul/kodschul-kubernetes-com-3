@@ -1,0 +1,15 @@
+{{- if .Values.persistence.enabled }}
+# Nur wenn persistence.enabled true ist; sonst nutzt das Frontend ein emptyDir
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-data
+  labels:
+    {{- include "hello.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size }}
+{{- end }}

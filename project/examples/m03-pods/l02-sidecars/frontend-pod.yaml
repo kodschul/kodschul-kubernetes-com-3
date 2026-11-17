@@ -1,0 +1,35 @@
+# Lab 3.2: Frontend mit nativem Sidecar-Container, der access.log mitliest
+apiVersion: v1
+kind: Pod
+metadata:
+  name: frontend
+  labels:
+    app: hello
+    tier: frontend
+spec:
+  initContainers:                    # Init-Container starten vor den Haupt-Containern
+    - name: log-reader
+      image: busybox:1.37            # kleines Image mit sh, touch und tail
+      restartPolicy: Always          # macht aus dem Init-Container einen Sidecar:
+                                     # er läuft weiter, solange der Pod läuft (stabil seit 1.33)
+      command: ["sh", "-c", "touch /data/access.log && tail -F /data/access.log"]
+                                     # Datei anlegen, dann jede neue Zeile ausgeben
+      volumeMounts:
+        - name: data                 # Volume "data" (unten definiert) ...
+          mountPath: /data           # ... im Sidecar unter /data einhängen
+  containers:
+    - name: frontend
+      image: hello-frontend:v1
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 80
+      env:
+        - name: BACKEND_URL
+          # Platzhalter: eigene Pod-IP des Backends eintragen
+          value: "http://10.1.0.23"
+      volumeMounts:
+        - name: data                 # dasselbe Volume ...
+          mountPath: /data           # ... im Frontend unter /data: dort schreibt es access.log
+  volumes:                           # Volumes des Pods, alle Container können sie einhängen
+    - name: data
+      emptyDir: {}                   # leeres Verzeichnis, lebt so lange wie der Pod (Lab 7.1)

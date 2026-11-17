@@ -1,0 +1,7 @@
+# Steckbrief des Charts: Name, Chart-Version, App-Version
+apiVersion: v2                 # Chart-API v2 (Helm 3 und Helm 4)
+name: hello                    # Name des Charts
+description: Hello-App (Frontend und Backend) aus dem Kurs Kubernetes Einführung
+type: application              # installierbares Chart (Gegenstück: library)
+version: 0.3.0                 # Lab 10.3: securityContext und Port als Werte
+appVersion: "v2"               # Version der App; Standard-Tag des Frontend-Images
