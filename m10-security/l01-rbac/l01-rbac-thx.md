@@ -206,7 +206,7 @@ In der Übung bekommen `anna` (dev deployen) und `ben` (prod lesen) eigene Rolle
 
 ### Zusammengesetzte ClusterRoles
 
-Die fertigen Rollen `view`, `edit` und `admin` sind zusammengesetzt (englisch: aggregated): Ihr Feld `aggregationRule` sammelt die Regeln aller ClusterRoles mit einem bestimmten Label ein. Bringt ein Operator eine neue Objektart mit (CRD, Lab 7.3), liefert er meist eine ClusterRole mit diesem Label mit, und wer `view` hat, kann die neuen Objekte sofort lesen:
+Die fertigen Rollen `view`, `edit` und `admin` sind zusammengesetzt (englisch: aggregated): Das Feld `aggregationRule` dieser Rollen sammelt die Regeln aller ClusterRoles mit einem bestimmten Label ein. Bringt ein Operator eine neue Objektart mit (CRD, Lab 7.3), liefert er meist eine ClusterRole mit diesem Label mit, und wer `view` hat, kann die neuen Objekte sofort lesen:
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1

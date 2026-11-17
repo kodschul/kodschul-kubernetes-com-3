@@ -172,10 +172,10 @@ In der Übung läuft das Chart `hello` in `hello-dev` und `hello-prod`, prod wir
 
 ### Pipeline mit Helm in GitLab CI/CD
 
-Zwei Stufen: Erst prüfen, dann ausrollen. Scheitert das Ausrollen, setzt `--rollback-on-failure` den letzten guten Stand zurück, und der Job endet rot.
+Die Pipeline liegt als Datei im Git-Repository der App (Ablage für Quellcode mit Versionsgeschichte, Lab 11.3) und läuft bei jeder Änderung. Zwei Stufen: Erst prüfen, dann ausrollen. Scheitert das Ausrollen, setzt `--rollback-on-failure` den letzten guten Stand zurück, und der Job endet rot.
 
 ```yaml
-# .gitlab-ci.yml im Repository neben dem Ordner hello/ und values-prod.yaml
+# .gitlab-ci.yml im Git-Repository neben dem Ordner hello/ und values-prod.yaml
 stages: [test, deploy]
 
 default:
@@ -200,4 +200,4 @@ prod-ausrollen:
   environment: production
 ```
 
-`$CI_COMMIT_SHORT_SHA` ist die Kurzkennung der Änderung im Repository; ein vorheriger Job baut das Image mit genau diesem Tag (hier weggelassen). So passt jede Revision in `helm history` zu genau einer Änderung im Repository. Tag `alpine/helm:4.3.2` vom 13.11.2026, Stand: 11/2026 ([Docker Hub](https://hub.docker.com/r/alpine/helm/tags)).
+`$CI_COMMIT_SHORT_SHA` ist die Kurzkennung der Änderung im Git-Repository; ein vorheriger Job baut das Image mit genau diesem Tag (hier weggelassen). So passt jede Revision in `helm history` zu genau einer Änderung im Git-Repository. Tag `alpine/helm:4.3.2` vom 13.11.2026, Stand: 11/2026 ([Docker Hub](https://hub.docker.com/r/alpine/helm/tags)).

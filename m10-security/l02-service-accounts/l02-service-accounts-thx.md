@@ -59,7 +59,7 @@ Typische Programme mit eigenem ServiceAccount:
 | Pods verwalten oder skalieren | Operatoren (Lab 7.3), Gateway-Controller wie Envoy Gateway (Lab 5.3), Autoscaler | eigene Objektarten und Pods anlegen, ändern, löschen |
 | App fragt den Cluster | Test-Pod `api-test` in dieser Übung | nur das, was die App wirklich braucht |
 
-Eine Pipeline außerhalb des Clusters nutzt ebenfalls einen ServiceAccount: Ihre kubeconfig enthält ein Token dieses Kontos (Befehl `kubectl create token` weiter unten), oder sie meldet sich über einen Identitätsanbieter an.
+Eine Pipeline außerhalb des Clusters nutzt ebenfalls einen ServiceAccount: Die kubeconfig der Pipeline enthält ein Token dieses Kontos (Befehl `kubectl create token` weiter unten), oder die Anmeldung läuft über einen Identitätsanbieter.
 
 ## Was im Pod ankommt
 

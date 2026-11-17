@@ -119,7 +119,7 @@ _Quelle: Istio-Dokumentation, „Architecture" (https://istio.io/latest/docs/ops
 | Observability | Metriken, Logs und Traces je Anfrage, ohne Änderung am Code |
 
 - **Istio:** verbreitetstes Mesh auf Basis von Envoy, aktuell 1.32 (09.11.2026, [Releases](https://github.com/istio/istio/releases), Stand: 11/2026). Seit Istio 1.24 (07.11.2024) ist der **Ambient-Modus** allgemein verfügbar ([Istio](https://istio.io/latest/news/releases/1.24.x/announcing-1.24/)). Ältere Unterlagen mit Pilot, Mixer, Citadel und Galley sind überholt: Pilot, Citadel und Galley stecken seit Istio 1.5 (2020) in `istiod`, Mixer ist entfallen.
-- **Envoy:** 2016 bei Lyft entstandener Proxy, seit 2018 CNCF-Projekt mit höchstem Reifegrad ([CNCF](https://www.cncf.io/projects/envoy/)); derselbe Proxy steckt in Envoy Gateway aus Lab 5.3.
+- **Envoy:** 2016 von Lyft veröffentlichter Proxy, seit 2018 CNCF-Projekt mit höchstem Reifegrad ([CNCF](https://www.cncf.io/projects/envoy/)); derselbe Proxy steckt in Envoy Gateway aus Lab 5.3.
 - **Linkerd:** kleineres Mesh mit eigenem, schlankem Proxy; Fokus auf einfachen Betrieb ([linkerd.io](https://linkerd.io/)).
 - Beide unterstützen die Gateway API; ein Mesh lohnt sich erst bei vielen Diensten.
 
@@ -194,3 +194,40 @@ Alle drei sind praktische Prüfungen im Terminal und zielen auf Kubernetes v1.37
 - KI-Werkzeuge bekommen nur Leserechte; neue Funktionen wie MutatingAdmissionPolicy und DRA sind seit 2025/2026 stabil.
 
 Im Plenum entsteht aus dieser Landkarte die Liste der ersten Bausteine für die eigenen Projekte.
+
+## Vertiefung
+
+### Abfragen in PromQL und LogQL
+
+| Sprache | Abfrage | Ergebnis |
+| --- | --- | --- |
+| PromQL | `sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="hello"}[5m]))` | CPU-Verbrauch je Pod im Namespace `hello`, Mittel der letzten 5 Minuten |
+| PromQL | `sum by (namespace) (rate(container_cpu_usage_seconds_total[5m]))` | CPU-Verbrauch je Namespace |
+| LogQL | `{namespace="hello"}` | alle Log-Zeilen aus dem Namespace `hello` |
+| LogQL | `{namespace="hello", container="frontend"} \|= "Backend nicht erreichbar"` | nur Zeilen des Frontends, die diesen Text enthalten |
+
+Welche Labels Loki kennt, legt die Alloy-Konfiguration fest; `namespace`, `pod` und `container` sind üblich.
+
+### Envoy-Begriffe in der Gateway API
+
+| Envoy-Konfiguration | Bedeutung | Gegenstück aus Lab 5.3 |
+| --- | --- | --- |
+| Listener | Port und Protokoll, auf dem Envoy Verbindungen annimmt | Listener `http`, Port 80 im Gateway |
+| Route | Regel nach Pfad oder Header, welches Ziel eine Anfrage bekommt | Regel in der HTTPRoute, z. B. `/api` |
+| Cluster | Gruppe gleichartiger Ziele mit Lastverteilung | Service in `backendRefs` mit seinen Pods |
+
+Envoy Gateway übersetzt Gateway und HTTPRoute in diese Envoy-Konfiguration. Timeouts und Wiederholungen gehören inzwischen zum Standard der Gateway API ([Timeouts](https://gateway-api.sigs.k8s.io/guides/http-timeouts/), [Retries](https://gateway-api.sigs.k8s.io/geps/gep-1731/), Stand: 11/2026), etwa für die Regel `/api` der Hello-App:
+
+```yaml
+  rules:
+    - matches:
+        - path: { type: PathPrefix, value: /api }
+      backendRefs:
+        - name: hello-backend
+          port: 80
+      timeouts:
+        request: 20s              # Anfrage nach 20 Sekunden mit Fehler beenden
+      retry:
+        codes: [500, 502, 503]    # bei diesen Antworten des Backends
+        attempts: 3               # höchstens dreimal wiederholen
+```
